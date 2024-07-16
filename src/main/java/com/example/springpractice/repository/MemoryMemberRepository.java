@@ -1,9 +1,11 @@
 package com.example.springpractice.repository;
 
 import com.example.springpractice.domain.Member;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class MemoryMemberRepository implements MemberRepository {
 
     // 공유되는 변수일 경우 동시성 문제로 아래와 같이 사용해야하나, 여기선 패스
