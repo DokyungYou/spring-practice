@@ -4,11 +4,13 @@ import com.example.springpractice.domain.Member;
 import com.example.springpractice.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 
+@Transactional // jpa를 쓰려면 항상 Transactional 이 있어야한다. (데이터 저장, 변경 시 )
 public class MemberService {
     private final MemberRepository memberRepository; // DI 상태
 
