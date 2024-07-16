@@ -18,6 +18,8 @@ public class MemberController {
     @Autowired
     public MemberController(MemberService memberService) {
         this.memberService = memberService;
+        System.out.println("memberService: " + memberService.getClass());
+        // memberService: class com.example.springpractice.service.MemberService$$SpringCGLIB$$0 (복제해서 코드를 조작)
     }
 
     @GetMapping("members/new")

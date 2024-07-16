@@ -1,5 +1,6 @@
 package com.example.springpractice;
 
+import com.example.springpractice.aop.TimeTraceAop;
 import com.example.springpractice.repository.JdbcTemplateMemberRepository;
 import com.example.springpractice.repository.JpaMemberRepository;
 import com.example.springpractice.repository.MemberRepository;
@@ -48,4 +49,10 @@ public class SpringConfig {
         // return new JdbcTemplateMemberRepository(dataSource); // 구현체만 바꿔끼면 된다. (서비스 로직은 변경 x, OCP원칙)
         //return new JpaMemberRepository(entityManager);
     }*/
+
+
+//    @Bean
+//    public TimeTraceAop timeTraceAop(){
+//        return new TimeTraceAop();
+//    }
 }

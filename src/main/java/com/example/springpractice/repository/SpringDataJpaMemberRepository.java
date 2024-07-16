@@ -15,5 +15,5 @@ public interface SpringDataJpaMemberRepository extends JpaRepository<Member, Lon
     Optional<Member> findByName(String name);  // jpql로 번역돼서 실행이 된다. select m from Member m where m.name = ?
 
     @Override
-    void clear();
+    default void clear(){};
 }
