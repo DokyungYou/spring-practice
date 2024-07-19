@@ -1,4 +1,4 @@
-package com.example.springpractice.printBeans;
+package com.example.springpractice.findBeans;
 
 import com.example.springpractice.AppConfig;
 import org.junit.jupiter.api.DisplayName;
