@@ -1,8 +1,8 @@
 package com.example.springpractice.member.service;
 
+import com.example.springpractice.AppConfig;
 import com.example.springpractice.member.Grade;
 import com.example.springpractice.member.Member;
-import com.example.springpractice.member.repository.MemoryMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,12 +11,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MemberServiceTest {
 
-    MemberService memberService = new MemberServiceImpl(new MemoryMemberRepository());
+    MemberService memberService;
 
 
     @BeforeEach
     void init(){
-
+        AppConfig appConfig = new AppConfig();
+        memberService = appConfig.memberService();
     }
 
     @DisplayName("회원가입 - 성공")

@@ -1,24 +1,26 @@
 package com.example.springpractice.order;
 
-import com.example.springpractice.discount.FixedDiscountPolicy;
+import com.example.springpractice.AppConfig;
 import com.example.springpractice.member.Grade;
 import com.example.springpractice.member.Member;
-import com.example.springpractice.member.repository.MemberRepository;
-import com.example.springpractice.member.repository.MemoryMemberRepository;
 import com.example.springpractice.member.service.MemberService;
-import com.example.springpractice.member.service.MemberServiceImpl;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderServiceTest {
+    MemberService memberService;
+    OrderService orderService;
 
+    @BeforeEach
+    void init(){
+        AppConfig appConfig = new AppConfig();
+        memberService = appConfig.memberService();
+        orderService = appConfig.orderService();
+    }
 
-    MemberRepository memberRepository = new MemoryMemberRepository();
-    MemberService memberService = new MemberServiceImpl(memberRepository);
-    OrderService orderService = new OrderServiceImpl(memberRepository, new FixedDiscountPolicy());
 
     @DisplayName("주문생성 - 성공")
     @Test
