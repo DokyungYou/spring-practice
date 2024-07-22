@@ -17,6 +17,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AppConfig {
 
+    // @Configuration 이 있어야 싱글톤 보장
+    // @Configuration 없이 @Bean 사용이 가능하나, 싱글톤 보장 x
+    // 아래 코드에서 memberRepository() 가 여러번 호출돼버릴 것임
+
     @Bean
     public MemberService memberService(){
         System.out.println("AppConfig.memberService 호출");
