@@ -1,5 +1,10 @@
 package com.example.springpractice;
 
+import com.example.springpractice.member.repository.MemberRepository;
+import com.example.springpractice.member.repository.MemoryMemberRepository;
+import com.example.springpractice.member.service.MemberService;
+import com.example.springpractice.member.service.MemberServiceImpl;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -16,4 +21,11 @@ public class AutoAppConfig {
 
     // 스프링부트의 경우 @SpringBootApplication(스프링 부트의 대표 시작 정보) 를 프로젝트 시작 위치에 두는 것이 관례
     // @SpringBootApplication 안에 @ComponentScan 이 있기때문에 @ComponentScan를 따로 사용할 일이 없음
+
+    
+    // 중복등록 테스트용
+/*    @Bean(name = "memoryMemberRepository")
+    MemberRepository memberRepository(){
+        return new MemoryMemberRepository();
+    }*/
 }

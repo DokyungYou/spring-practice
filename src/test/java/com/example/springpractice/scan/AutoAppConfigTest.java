@@ -1,6 +1,7 @@
 package com.example.springpractice.scan;
 
 import com.example.springpractice.AutoAppConfig;
+import com.example.springpractice.member.repository.MemberRepository;
 import com.example.springpractice.member.service.MemberService;
 import com.example.springpractice.order.OrderService;
 import org.junit.jupiter.api.Test;
