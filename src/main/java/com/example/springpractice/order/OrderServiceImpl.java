@@ -24,12 +24,20 @@ public class OrderServiceImpl implements OrderService{
 
     // @Qualifier 방식 (생성자 외 수정자, 필드, 수동 bean 등록 시에도 사용 가능)
     // 빈 이름 변경 X, 추가 구분자역할
+//    @Autowired  // DiscountPolicy <- RateDiscountPolicy, FixedDiscountPolicy
+//    public OrderServiceImpl(MemberRepository memberRepository, @Qualifier("mainDiscountPolicy") DiscountPolicy fixedDiscountPolicy) { // 같은 Qualifier를 찾아서 주입
+//        this.discountPolicy = fixedDiscountPolicy;
+//        this.memberRepository = memberRepository;
+//    }
+
+
+    // @Primary 방식 (동일 타입의 bean이 여러개일 때, @Primary 인 bean 주입)
+    // 메인으로 사용할 bean은 @Primary, 서브로 사용할 bean은 @Qualifier방식으로로 두 방식을 같이 쓰면 된다.
     @Autowired  // DiscountPolicy <- RateDiscountPolicy, FixedDiscountPolicy
-    public OrderServiceImpl(MemberRepository memberRepository, @Qualifier("mainDiscountPolicy") DiscountPolicy fixedDiscountPolicy) { // 같은 Qualifier를 찾아서 주입
-        this.discountPolicy = fixedDiscountPolicy;
+    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) { 
+        this.discountPolicy = discountPolicy;
         this.memberRepository = memberRepository;
     }
-
 
 
     // 수정자 주입 테스트용
