@@ -3,21 +3,21 @@ package com.example.springpractice.order;
 import com.example.springpractice.discount.DiscountPolicy;
 import com.example.springpractice.member.Member;
 import com.example.springpractice.member.repository.MemberRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService{
 
     private final MemberRepository memberRepository;
     private final DiscountPolicy discountPolicy;
 
-    @Autowired
-    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
-        this.discountPolicy = discountPolicy;
-        this.memberRepository = memberRepository;
-    }
+//    @Autowired
+//    public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy discountPolicy) {
+//        this.discountPolicy = discountPolicy;
+//        this.memberRepository = memberRepository;
+//    }
 
     // 수정자 주입 테스트용
 /*    private MemberRepository memberRepository;

@@ -1,7 +1,6 @@
 package com.example.springpractice.member.repository;
 
 import com.example.springpractice.member.Member;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
