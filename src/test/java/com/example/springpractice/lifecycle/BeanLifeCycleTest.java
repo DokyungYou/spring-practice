@@ -12,7 +12,7 @@ public class BeanLifeCycleTest {
     void lifeCycleTest(){
         ConfigurableApplicationContext ac = new AnnotationConfigApplicationContext(LifeCycleConfig.class);
         NetworkClient client = ac.getBean(NetworkClient.class);
-        ac.close();
+        ac.close(); // 컨테이너 종료 (빈들도 같이 종료)
     }
 
     @Configuration
