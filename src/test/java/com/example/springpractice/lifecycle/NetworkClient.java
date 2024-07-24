@@ -1,9 +1,11 @@
 package com.example.springpractice.lifecycle;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public class NetworkClient { // 해당 빈이 스프링 코드에 의존적이지 않음
+public class NetworkClient { // @PostConstruct, @PreDestroy 은 자바에서 제공해주는 어노테이션 (스프링 외의 컨테이너 사용하게 돼도 적용이 가능)
 
     private String url;
 
@@ -35,6 +37,7 @@ public class NetworkClient { // 해당 빈이 스프링 코드에 의존적이�
 
 
     // 프로퍼티의 세팅 후 (의존관계 주입이 끝나면) 콜백함수 용도
+    @PostConstruct
     public void init() throws Exception {
         System.out.println(" NetworkClient init() 호출");
         connect();
@@ -42,6 +45,7 @@ public class NetworkClient { // 해당 빈이 스프링 코드에 의존적이�
     }
 
     // 빈이 종료되기 직전에 자동 호출 용도
+    @PreDestroy
     public void close() throws Exception {
         System.out.println("NetworkClient close() 호출");
         disconnect();
