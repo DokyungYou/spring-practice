@@ -2,10 +2,10 @@ package com.example.springpractice.scope;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import jakarta.inject.Provider;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -54,11 +54,11 @@ public class SingleWithPrototypeTest2 {
     @RequiredArgsConstructor
     static class ClientBean {
         private final PrototypeBean prototypeBean;
-        private final ObjectProvider<PrototypeBean> prototypeBeanProvider; // 대신 조회해주는 역할
+        private final Provider<PrototypeBean> prototypeBeanProvider; // jakarta.inject.Provider 로 변경
        //private final ObjectFactory<PrototypeBean> prototypeBeanFactory;
 
         private int logic(){
-            PrototypeBean prototypeBean = prototypeBeanProvider.getObject();
+            PrototypeBean prototypeBean = prototypeBeanProvider.get();
             prototypeBean.addCount();
             return prototypeBean.getCount();
         }
