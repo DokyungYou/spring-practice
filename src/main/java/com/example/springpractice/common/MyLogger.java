@@ -3,12 +3,13 @@ package com.example.springpractice.common;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 @Component
-@Scope(value = "request")
+@Scope(value = "request" , proxyMode = ScopedProxyMode.TARGET_CLASS) // 의존관계 주입 시 가짜 프록시 객체로 주입
 public class MyLogger {
 
     private String uuid;

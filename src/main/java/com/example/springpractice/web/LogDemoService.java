@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LogDemoService {
 
-    private final ObjectProvider<MyLogger> myLoggerProvider;
+    //private final ObjectProvider<MyLogger> myLoggerProvider;
+    private final MyLogger myLogger;
+
     public void logic(String id) {
-        MyLogger myLogger = myLoggerProvider.getObject(); // 따로 호출해도 같은 HTTP 요청일 시 같은 bean이 반환
+        //MyLogger myLogger = myLoggerProvider.getObject(); // 따로 호출해도 같은 HTTP 요청일 시 같은 bean이 반환
         myLogger.log("service id: " + id);
     }
 }
