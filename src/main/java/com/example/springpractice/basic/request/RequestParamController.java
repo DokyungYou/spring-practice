@@ -1,12 +1,11 @@
 package com.example.springpractice.basic.request;
 
+import com.example.springpractice.basic.HelloData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -99,6 +98,42 @@ public class RequestParamController {
     public String requestParamMap(@RequestParam Map<String, Object> paramMap){
 
         log.info("userName ={}, age={}", paramMap.get("username"), paramMap.get("age"));
+        return "OK";
+    }
+
+
+    @RequestMapping("/model-attribute-v0")
+    @ResponseBody
+    public String modelAttributeV0(@RequestParam(defaultValue = "anonymous") String username,
+                                  @RequestParam(defaultValue = "-1") int age){
+
+        HelloData helloData = new HelloData();
+        helloData.setUsername(username);
+        helloData.setAge(age);
+
+        log.info("userName ={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "OK";
+    }
+
+    /** @ModelAttribute
+     * 객체 생성
+     * 요청 파라미터 이름으로 객체의 프로퍼티 찾기 (프로퍼티는 setXXX, getXXX 등을 말함)
+     * 해당 프로퍼티의 setter 호출 (파라미터의 값을 바인딩)
+     */
+    // 다른 타입으로 바인딩 시도할때의 문제는 후에 검증부분에서 다룬다
+    @RequestMapping("/model-attribute-v1")
+    @ResponseBody
+    public String modelAttributeV1(@ModelAttribute HelloData helloData){
+
+        log.info("userName ={}, age={}", helloData.getUsername(), helloData.getAge());
+        return "OK";
+    }
+
+    @RequestMapping("/model-attribute-v2")
+    @ResponseBody
+    public String modelAttributeV2(HelloData helloData){ // argument resolver로 지정해둔 타입 외는 @ModelAttribute 자동처리해줌
+
+        log.info("userName ={}, age={}", helloData.getUsername(), helloData.getAge());
         return "OK";
     }
 
