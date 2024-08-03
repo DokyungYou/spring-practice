@@ -28,6 +28,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web' // 내장 톰켓 서버를 활용해서 웹 서버와 스프링을 함께 실행하게끔 해줌
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
 
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
