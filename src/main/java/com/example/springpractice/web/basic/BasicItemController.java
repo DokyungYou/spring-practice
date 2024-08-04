@@ -105,6 +105,23 @@ public class BasicItemController {
         return "basic/item";
     }
 
+    @GetMapping("/{itemId}/edit")
+    public String editForm(@PathVariable long itemId, Model model){
+        model.addAttribute("item", itemRepository.findById(itemId));
+        return "basic/editForm";
+    }
+
+
+    /**
+     * HTML Form 전송은 PUT, PATCH를 지원하지 않는다. (Get, Post만 가능)
+     */
+    @PostMapping("/{itemId}/edit")
+    public String editItem(@PathVariable long itemId, @ModelAttribute Item item){
+        itemRepository.updateItem(itemId, item);
+
+        return "redirect:/basic/items/{itemId}";
+    }
+
 
     /**
      * 테스트용 데이터
