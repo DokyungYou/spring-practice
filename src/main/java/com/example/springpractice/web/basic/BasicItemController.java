@@ -94,15 +94,26 @@ public class BasicItemController {
     /**
      * 임의객체를 파라미터로 받을 시 자동으로 @ModelAttribute 적용
      */
+//    @PostMapping("/add")
+//    public String addItemV4(Item item){
+//
+//        log.debug("item.name = {}", item.getName());
+//
+//        Item savedItem = itemRepository.save(item);
+//        //model.addAttribute("item", savedItem);
+//
+//        return "basic/item";
+//    }
+
     @PostMapping("/add")
-    public String addItemV4(Item item){
+    public String addItemV5(Item item){
 
         log.debug("item.name = {}", item.getName());
 
         Item savedItem = itemRepository.save(item);
         //model.addAttribute("item", savedItem);
 
-        return "basic/item";
+        return "redirect:/basic/items/" + item.getId();
     }
 
     @GetMapping("/{itemId}/edit")
