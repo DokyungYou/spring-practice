@@ -118,6 +118,12 @@ public class BasicController {
         return "basic/comments";
     }
 
+    @GetMapping("/block")
+    public String block(Model model) {
+        addUsers(model);
+        return "basic/block";
+    }
+
 
     // 실습용
     private void addUsers(Model model){
