@@ -49,6 +49,20 @@
         </div>
     </div>
 
+    <!-- multi checkbox -->
+    <div>
+        <div>등록 지역</div>
+        <div th:each="region : ${regions}" class="form-check form-check-inline">
+            <input type="checkbox" th:field="${item.regions}" th:value="${region.key}"
+                   class="form-check-input" disabled>
+
+            <!--name 은 같아도 되지만, id 는 모두 달라야함, 타임리프가 each문 안에서 임의로 숫자를 붙여줌 (동적으로 생성되는 id값) -->
+            <label th:for="${#ids.prev('regions')}"
+                   th:text="${region.value}" class="form-check-label">지역이름</label>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col">
             <button class="w-100 btn btn-primary btn-lg"
