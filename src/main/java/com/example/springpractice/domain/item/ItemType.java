@@ -1,5 +1,8 @@
 package com.example.springpractice.domain.item;
 
+import lombok.Getter;
+
+@Getter
 public enum ItemType {
     
     BOOK("도서"),
