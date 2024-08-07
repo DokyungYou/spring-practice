@@ -58,8 +58,8 @@ public class ValidationItemControllerV2 {
         if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1_000_000){
             bindingResult.addError(new FieldError("item","price",  " 가격은 1,000 ~ 1,000,000원까지 허용합니다."));
         }
-        if(item.getQuantity() == null || item.getQuantity() > 9999){
-            bindingResult.addError(new FieldError("item","quantity",  "수량은 최대 9,999개 까지 허용합니다."));
+        if(item.getQuantity() == null || item.getQuantity() > 9999 || item.getQuantity() < 1){
+            bindingResult.addError(new FieldError("item","quantity",  "수량은 최대 1 ~ 9,999개 까지 허용합니다."));
         }
         
         // 특정 필드가 아닌 복합 룰 검증
