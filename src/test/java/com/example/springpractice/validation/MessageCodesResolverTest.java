@@ -26,6 +26,8 @@ public class MessageCodesResolverTest {
     @Test
     void messageResolverFiled(){
         String[] messageCodes = codesResolver.resolveMessageCodes("required", "item", "itemName", String.class);
+
+        // 나온 순서대로 메세지를 찾아나감
         log.info("messageCodes ={}", (Object) messageCodes); //  messageCodes =[required.item.itemName, required.itemName, required.java.lang.String, required]
 
         // 	public FieldError(String objectName, String field, @Nullable Object rejectedValue, boolean bindingFailure,
