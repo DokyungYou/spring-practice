@@ -142,7 +142,11 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+
+    /**
+     * 오류코드와 메시지 처리1
+     */
+    //@PostMapping("/add")
     public String addItemV3(@ModelAttribute Item item,
                             BindingResult bindingResult, // 위의 객체에 바인딩 된 결과를 담는용 (바인딩이 되는 파마리터 바로 다음의 위치에서 사용해야한다.)
                             RedirectAttributes redirectAttributes,
@@ -162,7 +166,7 @@ public class ValidationItemControllerV2 {
         }
         if(item.getQuantity() == null || item.getQuantity() > 9999 || item.getQuantity() < 1){
             bindingResult.addError(new FieldError("item","quantity",
-                    item.getQuantity(),false, new String[]{"max.item.quantity"},new Object[]{1, 9999},null));
+                    item.getQuantity(),false, new String[]{"range.item.quantity"},new Object[]{1, 9999},null));
         }
 
         // 특정 필드가 아닌 복합 룰 검증
@@ -172,6 +176,58 @@ public class ValidationItemControllerV2 {
                 // 특정 필드가 아니어서 임의로 글로벌 오류로 지칭
                 bindingResult.addError(new ObjectError("item",
                         "가격 * 수량의 합은 10,000원 이상이어야합니다. 현재 값 :"  + resultPrice + "원"));
+            }
+        }
+
+        // 검증 실패 시 다시 입력 form 으로 이동
+        if(bindingResult.hasErrors()){
+            log.info("errors = {}", bindingResult);
+            // BindingResult 는 자동으로 view에 넘어가기때문에 model에 따로 직접 넣어줄 필요가 없다.
+
+            // @ModelAttribute 로 값을 받아왔기때문에, 해당 form 으로 돌아갈 때 다시 가지고 감
+            // (addForm 에선 빈 객체를 받아서 랜더링 하게끔 해놔서 가능, @GetMapping("/add") 참고)
+            return "validation/v2/addForm";
+        }
+
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+
+    /**
+     * rejectValue() , reject()
+     */
+    @PostMapping("/add")
+    public String addItemV4(@ModelAttribute Item item,
+                            BindingResult bindingResult, // 위의 객체에 바인딩 된 결과를 담는용 (바인딩이 되는 파마리터 바로 다음의 위치에서 사용해야한다.)
+                            RedirectAttributes redirectAttributes,
+                            Model model) {
+
+        // BindingResult 는 이미 타겟과 이름을 알고있다.
+        log.info("objectName = {}", bindingResult.getObjectName());
+        log.info("target ={}", bindingResult.getTarget());
+
+
+        // 검증 로직
+        if(!StringUtils.hasText(item.getItemName())){
+            bindingResult.rejectValue("itemName", "required");
+        }
+        if(item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1_000_000){
+            bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+        }
+        if(item.getQuantity() == null || item.getQuantity() > 9999 || item.getQuantity() < 1){
+            bindingResult.rejectValue("quantity","range", new Object[]{1, 9999}, null);
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if(item.getPrice() != null && item.getQuantity() != null){
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if(resultPrice < 10000){
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
         }
 
