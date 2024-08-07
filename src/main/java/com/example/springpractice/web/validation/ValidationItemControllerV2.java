@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -21,6 +23,14 @@ public class ValidationItemControllerV2 {
 
     private final ItemRepository itemRepository;
     private final ItemValidator itemValidator;
+
+    /**
+     * 해당 컨트롤러가 호출될 때마다 항상 호출됨
+     */
+    @InitBinder
+    public void init(WebDataBinder dataBinder){ // 요청이 올때마다 dataBinder 가 내부적으로 만들어져서 온다.
+        dataBinder.addValidators(itemValidator); // WebDataBinder에 검증기 추가
+    }
 
     @GetMapping
     public String items(Model model) {
@@ -250,7 +260,7 @@ public class ValidationItemControllerV2 {
         return "redirect:/validation/v2/items/{itemId}";
     }
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV5(@ModelAttribute Item item,
                             BindingResult bindingResult, // 위의 객체에 바인딩 된 결과를 담는용 (바인딩이 되는 파마리터 바로 다음의 위치에서 사용해야한다.)
                             RedirectAttributes redirectAttributes,
@@ -260,6 +270,28 @@ public class ValidationItemControllerV2 {
         if(itemValidator.supports(item.getClass())){
             itemValidator.validate(item, bindingResult);
         }
+
+        // 검증 실패 시 다시 입력 form 으로 이동
+        if(bindingResult.hasErrors()){
+            // BindingResult 는 자동으로 view에 넘어가기때문에 model에 따로 직접 넣어줄 필요가 없다.
+
+            // @ModelAttribute 로 값을 받아왔기때문에, 해당 form 으로 돌아갈 때 다시 가지고 감
+            // (addForm 에선 빈 객체를 받아서 랜더링 하게끔 해놔서 가능, @GetMapping("/add") 참고)
+            return "validation/v2/addForm";
+        }
+
+        // 성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemV6(@Validated @ModelAttribute Item item, // @Validated : 자동으로 검증기를 실행하는 어노테이션
+                            BindingResult bindingResult, // 위의 객체에 바인딩 된 결과를 담는용 (바인딩이 되는 파마리터 바로 다음의 위치에서 사용해야한다.)
+                            RedirectAttributes redirectAttributes,
+                            Model model) {
 
         // 검증 실패 시 다시 입력 form 으로 이동
         if(bindingResult.hasErrors()){
