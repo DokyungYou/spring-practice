@@ -1,10 +1,8 @@
 package com.example.springpractice.domain.item;
 
-import jakarta.validation.constraints.Min;
-import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
+import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 @Data
@@ -33,4 +31,5 @@ public class Item {
         this.price = price;
         this.quantity = quantity;
     }
+
 }
