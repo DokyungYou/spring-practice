@@ -19,7 +19,7 @@ public class Item {
     private Integer price;
 
     @NotNull
-    @Range(min = 1 , max = 9999 )
+    @Range(min = 1 , max = 9999)
     private Integer quantity;
 
     public Item() {
