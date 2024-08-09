@@ -1,10 +1,9 @@
 package com.example.springpractice.web.item.form;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Data
 public class ItemUpdateForm {
@@ -12,7 +11,6 @@ public class ItemUpdateForm {
     @NotNull
     private Long id;
 
-    @NotBlank
     private String itemName;
 
     @NotNull
