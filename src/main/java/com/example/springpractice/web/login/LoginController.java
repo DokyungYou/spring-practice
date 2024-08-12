@@ -2,10 +2,12 @@ package com.example.springpractice.web.login;
 
 import com.example.springpractice.domain.login.LoginService;
 import com.example.springpractice.domain.member.Member;
+import com.example.springpractice.web.SessionConst;
 import com.example.springpractice.web.session.SessionManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +55,7 @@ public class LoginController {
 
 
     /** 로그인 (쿠키 + 세션) */
-    @PostMapping("/login")
+    //@PostMapping("/login")
     public String loginV2(@Valid @ModelAttribute("loginForm") LoginForm form,
                         BindingResult bindingResult,
                         HttpServletResponse response){
@@ -74,6 +76,36 @@ public class LoginController {
         return "redirect:/";
     }
 
+    /** HttpSession 사용
+     *
+     * 서블릿이 제공하는 HttpSession 도 결국 앞서 직접 만들어본 SessionManager 와 같은 방식으로 동작
+     * 서블릿을 통해 HttpSession 을 생성하면 다음과 같은 쿠키를 생성한다. 쿠키 이름이 JSESSIONID 이고, 값은 추정
+     * 불가능한 랜덤 값이다.
+     * Cookie: JSESSIONID=5B78E23B513F50164D6FDD8C97B0AD05
+     */
+    @PostMapping("/login")
+    public String loginV3(@Valid @ModelAttribute("loginForm") LoginForm form,
+                          BindingResult bindingResult,
+                          HttpServletRequest request){
+        if(bindingResult.hasErrors()){
+            return "login/loginForm";
+        }
+        Member loginMember = loginService.login(form.getLoginId(), form.getPassword());
+        if(loginMember == null){
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호 불일치"); // global 오류
+            return "login/loginForm";
+        }
+
+        // 로그인 성공 처리
+        // getSession()에 true로 넣어주면 세션이 있을때는 있는 기존의 세션 반환, 없다면 신규 세션 생성
+        // 사실 기본값이 true 이기 때문에 생략 가능
+        HttpSession session = request.getSession(true);
+        // 세션에 로그인 회원 정보 보관
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
+
+        return "redirect:/";
+    }
+
     //@PostMapping("/logout")
     public String logoutV1(HttpServletResponse response){
         expireCookie(response, "memberId");
@@ -82,10 +114,22 @@ public class LoginController {
     }
 
     /** 로그아웃 (쿠키 + 세션) */
-    @PostMapping("/logout")
+    //@PostMapping("/logout")
     public String logoutV2(HttpServletRequest request, HttpServletResponse response){
         sessionManager.expire(request);
         expireCookie(response, SessionManager.SESSION_COOKIE_NAME);
+        return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String logoutV3(HttpServletRequest request, HttpServletResponse response){
+        HttpSession session = request.getSession(false); // 기존 세션이 없다면 null반환
+        if(session != null){
+            expireCookie(response, "JSESSIONID"); // 남아있어도 상관없지만 지웠음
+            session.invalidate(); // 해당 세션과 안에 있는 데이터가 다 날라감
+        }
+
+
         return "redirect:/";
     }
 
