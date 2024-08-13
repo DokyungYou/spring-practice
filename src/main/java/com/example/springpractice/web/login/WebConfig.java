@@ -3,6 +3,7 @@ package com.example.springpractice.web.login;
 import com.example.springpractice.web.filter.LogFilter;
 import com.example.springpractice.web.filter.LoginCheckFilter;
 import com.example.springpractice.web.interceptor.LogInterceptor;
+import com.example.springpractice.web.interceptor.LoginCheckInterceptor;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .order(1)
                 .addPathPatterns("/**")
                 .excludePathPatterns("/css/**", "/*.ico", "/error");
+
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/","/members/add","/login","/css/**", "/*.ico", "/error");
     }
 
     // 이렇게 해놓으면 스프링부트가 WAS를 띄울 때 필터를 같이 넣어준다
@@ -33,7 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
         return filterRegistrationBean;
     }
 
-    @Bean
+    //@Bean
     public FilterRegistrationBean loginCheckFilter(){
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
         filterRegistrationBean.setFilter(new LoginCheckFilter());
