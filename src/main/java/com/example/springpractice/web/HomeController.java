@@ -2,6 +2,7 @@ package com.example.springpractice.web;
 
 import com.example.springpractice.domain.member.Member;
 import com.example.springpractice.domain.member.MemberRepository;
+import com.example.springpractice.web.argumentResolver.Login;
 import com.example.springpractice.web.session.SessionManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -87,10 +88,29 @@ public class HomeController {
     /** @SessionAttribute
      * 해당 기능은 세션을 생성하지 않음
      */
-    @GetMapping("/")
+    //@GetMapping("/")
     public String homeLoginV3Spring(
             Model model,
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember){
+
+
+        // 세션에 회원 데이터가 없다면 기본 home
+        if(loginMember == null){
+            return "home";
+        }
+
+        // 세션이 유지되면 로그인Home 으로 이동
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+    /** @SessionAttribute
+     * 해당 기능은 세션을 생성하지 않음
+     */
+    @GetMapping("/")
+    public String homeLoginV4ArgumentResolver(
+            Model model,
+            @Login Member loginMember){
 
 
         // 세션에 회원 데이터가 없다면 기본 home

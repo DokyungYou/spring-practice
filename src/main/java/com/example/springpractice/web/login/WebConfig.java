@@ -1,5 +1,6 @@
 package com.example.springpractice.web.login;
 
+import com.example.springpractice.web.argumentResolver.LoginMemberArgumentResolver;
 import com.example.springpractice.web.filter.LogFilter;
 import com.example.springpractice.web.filter.LoginCheckFilter;
 import com.example.springpractice.web.interceptor.LogInterceptor;
@@ -8,11 +9,19 @@ import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new LoginMemberArgumentResolver());
+    }
 
     // 인터셉터는 빈등록 방식이 아님
     @Override
