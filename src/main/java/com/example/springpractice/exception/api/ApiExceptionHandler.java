@@ -1,5 +1,6 @@
 package com.example.springpractice.exception.api;
 
+import com.example.springpractice.exception.custom.MemberException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,9 @@ public class ApiExceptionHandler {
         }
         if(id.equals("bad")){
             throw new IllegalArgumentException("잘못된 입력 값입니다!"); // 본래 500으로 전달될 것을 400으로 바꿀 것이다.
+        }
+        if(id.equals("member-ex")){
+            throw new MemberException("사용자 오류");
         }
         return new MemberDto(id, "이름");
     }

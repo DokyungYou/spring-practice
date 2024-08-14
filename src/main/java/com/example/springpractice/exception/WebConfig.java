@@ -2,6 +2,7 @@ package com.example.springpractice.exception;
 
 import com.example.springpractice.exception.filter.LogFilter;
 import com.example.springpractice.exception.interceptor.LogInterceptor;
+import com.example.springpractice.exception.resolver.MemberHandlerExceptionResolver;
 import com.example.springpractice.exception.resolver.MyHandlerExceptionResolver;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
@@ -20,6 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
         resolvers.add(new MyHandlerExceptionResolver());
+        resolvers.add(new MemberHandlerExceptionResolver());
     }
 
     //@Override
