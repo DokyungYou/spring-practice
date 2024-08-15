@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class ApiExceptionV2Controller {
 
     /**
-     * 해당 컨트롤러 내에 있는 핸들러는 같은 컨트롤러 내에서 발생한 예외만 처리해준다.
+     * @ControllerAdvice 에 해당 핸들러들을 등록하지 않을 경우
+     * 같은 컨트롤러 내에서 발생한 예외만 처리해준다.
+     * 이 부분 다시 실습하고싶으면 ExControllerAdvice 주석처리 하고 진행
      */
 
     /**
