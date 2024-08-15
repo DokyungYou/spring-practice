@@ -3,7 +3,9 @@ package com.example.springpractice.type;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
 @EqualsAndHashCode // 모든 필드의 값이 같다면 참
 @AllArgsConstructor

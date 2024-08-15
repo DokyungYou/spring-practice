@@ -1,5 +1,6 @@
 package com.example.springpractice.controller;
 
+import com.example.springpractice.type.IpPort;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,11 @@ public class HelloController {
     }
 
 
+    @GetMapping("/ip-port")
+    public String ipPort(@RequestParam IpPort ipPort){
+        log.info("ipPort ={}", ipPort);
+        return "OK";
+    }
 
 
 }
