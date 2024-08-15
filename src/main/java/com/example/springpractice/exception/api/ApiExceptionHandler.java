@@ -42,6 +42,11 @@ public class ApiExceptionHandler {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "error.bad", new IllegalArgumentException());
     }
 
+    @GetMapping("/default-handler-ex")
+    public String defaultException(@RequestParam Integer data){
+        return "ok";
+    }
+
     @Getter
     @Setter
     @AllArgsConstructor
