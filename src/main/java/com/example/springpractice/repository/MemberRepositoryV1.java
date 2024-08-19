@@ -127,6 +127,7 @@ public class MemberRepositoryV1 {
 
     private void close(Connection connection, Statement statement, ResultSet resultSet){
         // close 순서 중요
+        // 연결을 끊는게 아닌, 풀에 반납
         JdbcUtils.closeResultSet(resultSet);
         JdbcUtils.closeStatement(statement);
         JdbcUtils.closeConnection(connection);
