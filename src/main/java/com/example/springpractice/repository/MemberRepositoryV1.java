@@ -125,6 +125,25 @@ public class MemberRepositoryV1 {
         }
     }
 
+    // 테스트코드때문에 따로 만들었음
+    public void deleteAll() throws SQLException {
+        String sql = "delete from member";
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = getConnection();
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+
+        } finally {
+            close(connection, preparedStatement, null);
+        }
+    }
+
     private void close(Connection connection, Statement statement, ResultSet resultSet){
         // close 순서 중요
         // 연결을 끊는게 아닌, 풀에 반납
