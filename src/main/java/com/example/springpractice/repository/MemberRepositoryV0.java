@@ -5,6 +5,7 @@ import com.example.springpractice.domain.Member;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
+import java.util.NoSuchElementException;
 
 /**
  * JDBC - DriverManager 사용
@@ -42,7 +43,42 @@ public class MemberRepositoryV0 {
         }
     }
 
+    public Member findById(String memberId) throws SQLException {
+
+        String sql = "select * from member where member_id = ?";
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try{
+            connection = DBConnectionUtil.getConnection();
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, memberId);
+            resultSet = preparedStatement.executeQuery();
+
+            // 내부에 커서라는게 있는데  resultSet.next 를 한번 호출을 해줘야 실제 데이터가 있는 것부터 시작
+            if(resultSet.next()){
+                Member member = new Member();
+                member.setMemberId(resultSet.getString("member_id"));
+                member.setMoney(resultSet.getInt("money"));
+                return member;
+            }else {
+                throw new NoSuchElementException("member not found memberid=" + memberId);
+            }
+
+        }catch (SQLException e){
+            log.error("db error", e);
+            throw  e;
+
+        }finally {
+            close(connection, preparedStatement, resultSet);
+        }
+    }
+
     private void close(Connection connection, Statement statement, ResultSet resultSet){ // ResultSet 은 결과를 조회할 때 사용
+        
+        // close 순서 중요
         if(resultSet != null){
             try{
                 resultSet.close();

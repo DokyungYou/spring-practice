@@ -1,9 +1,6 @@
 package com.example.springpractice.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /*
 drop table member if exists cascade;
@@ -13,6 +10,9 @@ create table member (
 primary key (member_id)
 );
 */
+
+@EqualsAndHashCode
+@ToString
 @Getter
 @Setter
 @NoArgsConstructor
