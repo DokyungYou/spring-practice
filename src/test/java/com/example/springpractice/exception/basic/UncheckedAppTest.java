@@ -1,5 +1,6 @@
 package com.example.springpractice.exception.basic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.net.ConnectException;
@@ -7,13 +8,33 @@ import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Slf4j
 public class UncheckedAppTest {
 
     @Test
-    void checked(){
+    void unchecked(){
         Controller controller = new Controller();
         assertThatThrownBy(() -> controller.request())
                 .isInstanceOf(Exception.class);
+    }
+
+    @Test
+    void printEx(){
+        Controller controller = new Controller();
+
+        try{
+            controller.request();
+        }catch (Exception e) {
+            //e.printStackTrace(); // 지양
+
+
+            // Repository 의 call() 에서  언체크예외로 다시 던질 때 기존 체크예외를 담아서 던졌다.
+            // 로그로 찍을 때  Caused by: java.sql.SQLException: ex
+            // 처음 원인이었던 예외정보를 포함해서 볼 수 있다. 중요
+            log.info("ex", e);
+
+        }
+
     }
 
     static class Controller {
