@@ -51,17 +51,6 @@ public class MemberServiceV3_2 {
         memberRepository.update(toMember.getMemberId(), toMember.getMoney() + money);
     }
 
-    private static void release(Connection connection) {
-        try{
-            // 다시 기본값으로 변경 뒤 반납해줘야함 (커넥션 풀 고려)
-            connection.setAutoCommit(true);
-            connection.close();
-
-        }catch (Exception e){
-            log.error("error", e);
-        }
-    }
-
     private static void validation(Member toMember) {
         if(toMember.getMemberId().equals("ex")){
             throw new IllegalArgumentException("이체 중 예외발생");
