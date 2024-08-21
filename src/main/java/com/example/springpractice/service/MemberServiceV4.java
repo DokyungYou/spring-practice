@@ -4,6 +4,7 @@ import com.example.springpractice.domain.Member;
 import com.example.springpractice.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -30,9 +31,15 @@ public class MemberServiceV4 {
         Member fromMember = memberRepository.findById(fromId);
         Member toMember = memberRepository.findById(toId);
 
-        memberRepository.update(fromMember.getMemberId(), fromMember.getMoney() - money);
-        validation(toMember);
-        memberRepository.update(toMember.getMemberId(), toMember.getMoney() + money);
+        try{
+            memberRepository.update(fromMember.getMemberId(), fromMember.getMoney() - money);
+            validation(toMember);
+            memberRepository.update(toMember.getMemberId(), toMember.getMoney() + money);
+
+        }catch (DuplicateKeyException e){  // 이것은 다른 특정한 기술에 종속적인 것이 아닌, 스프링에서 제공해주는 것
+            // 원하는 로직을 적으면 됨
+        }
+
     }
 
     private static void validation(Member toMember) {
