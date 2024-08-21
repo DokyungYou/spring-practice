@@ -74,6 +74,10 @@ public class JdbcTemplateItemRepositoryV1 implements ItemRepository {
         }
     }
 
+    /**
+     * JDBC의 단점
+     * 동적쿼리를 생성하기가 까다롭다.
+     */
     @Override
     public List<Item> findAll(ItemSearchCondition condition) {
         String itemName = condition.getItemName();

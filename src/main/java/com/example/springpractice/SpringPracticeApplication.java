@@ -1,5 +1,6 @@
 package com.example.springpractice;
 
+import com.example.springpractice.config.JdbcTemplateV1Config;
 import com.example.springpractice.config.MemoryConfig;
 import com.example.springpractice.repository.ItemRepository;
 import org.springframework.boot.SpringApplication;
@@ -8,7 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-@Import(MemoryConfig.class)
+//@Import(MemoryConfig.class)
+@Import(JdbcTemplateV1Config.class)
 @SpringBootApplication(scanBasePackages = "com.example.springpractice.web") // 해당 경로와 하위경로를 스캔
 public class SpringPracticeApplication {
     public static void main(String[] args) {
