@@ -9,8 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
@@ -19,7 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *  @SpringBootTest 적용 시 @SpringBootApplication 를 찾아서 설정으로 사용
+ *
+ *  @Transactional 를 테스트에 적용 시 테스트가 끝나면 자동으로 롤백
+ *  src 하위에 있는 서비스, 레파지토리에 있는 @Transactional 도 테스트에서 시작한 트랜잭션에 참여 (트랜잭션 전파)
  */
+@Transactional
 @SpringBootTest
 class ItemRepositoryTest {
 
@@ -27,14 +33,14 @@ class ItemRepositoryTest {
     ItemRepository itemRepository;
 
     //트랜잭션 매니저는 스프링부트가 자동으로 빈으로 등록해줌
-    @Autowired
-    PlatformTransactionManager transactionManager;
-    TransactionStatus status;
+//    @Autowired
+//    PlatformTransactionManager transactionManager;
+//    TransactionStatus status;
 
     @BeforeEach
     void beforeEach() {
         //트랜잭션 시작
-        status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+        //status = transactionManager.getTransaction(new DefaultTransactionDefinition());
     }
 
     @AfterEach
@@ -45,9 +51,10 @@ class ItemRepositoryTest {
         }
 
         //트랜잭션 롤백
-        transactionManager.rollback(status);
+        //transactionManager.rollback(status);
     }
 
+    //@Commit
     @Test
     void save() {
         //given
