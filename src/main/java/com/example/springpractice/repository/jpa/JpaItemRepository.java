@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Repository
+@Repository // 예외 변환 AOP 적용대상이 된다.
 @Transactional // jpa에서 데이터를 변경 시엔 항상 트랜잭션이 있어야한다 (일반적으로는 서비스 계층에 걸어주는 것임)
 public class JpaItemRepository implements ItemRepository {
 

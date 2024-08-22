@@ -4,6 +4,7 @@ import com.example.springpractice.repository.ItemRepository;
 import com.example.springpractice.repository.ItemSearchCondition;
 import com.example.springpractice.repository.ItemUpdateDto;
 import com.example.springpractice.repository.memory.MemoryItemRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *  @Transactional 를 테스트에 적용 시 테스트가 끝나면 자동으로 롤백
  *  src 하위에 있는 서비스, 레파지토리에 있는 @Transactional 도 테스트에서 시작한 트랜잭션에 참여 (트랜잭션 전파)
  */
+@Slf4j
 @Transactional
 @SpringBootTest
 class ItemRepositoryTest {
@@ -94,6 +96,9 @@ class ItemRepositoryTest {
         Item item2 = new Item("itemA-2", 20000, 20);
         Item item3 = new Item("itemB-1", 30000, 30);
 
+
+
+        log.info("itemRepository={}", itemRepository.getClass());
         itemRepository.save(item1);
         itemRepository.save(item2);
         itemRepository.save(item3);
