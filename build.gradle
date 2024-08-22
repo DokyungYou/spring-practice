@@ -42,8 +42,13 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
+    //jdbc
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     runtimeOnly 'com.h2database:h2'
+
+    // MyBatis
+    // 스프링부트가 버전을 관리해주는 공식 라이브러리가 아니면 버전 관리를 안해주기때문에 뒤에 버전정보를 붙여야함
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 }
 
 tasks.named('test') {
