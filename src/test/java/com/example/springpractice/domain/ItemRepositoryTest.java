@@ -69,6 +69,7 @@ class ItemRepositoryTest {
     }
 
     @Test
+    //@Commit // 롤백때문에 쿼리문을 볼 수 없는데 , 궁금하면 @Commit 적용시키면 볼 수 있음
     void updateItem() {
         //given
         Item item = new Item("item1", 10000, 10);
