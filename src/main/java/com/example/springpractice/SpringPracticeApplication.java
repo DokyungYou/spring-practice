@@ -19,7 +19,8 @@ import javax.sql.DataSource;
 //@Import(JdbcTemplateV3Config.class)
 //@Import(MyBatisConfig.class)
 //@Import(JpaConfig.class)
-@Import(SpringDataJpaConfig.class)
+//@Import(SpringDataJpaConfig.class)
+@Import(QueryDslConfig.class)
 @Slf4j
 @SpringBootApplication(scanBasePackages = "com.example.springpractice.web") // 해당 경로와 하위경로를 스캔
 public class SpringPracticeApplication {
