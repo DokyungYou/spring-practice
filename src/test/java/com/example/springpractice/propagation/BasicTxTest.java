@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -135,8 +136,30 @@ public class BasicTxTest {
 
         assertThatThrownBy(()-> transactionManager.commit(outerTransaction))
                 .isInstanceOf(UnexpectedRollbackException.class);
+    }
 
+    @Test
+    void inner_rollback_requires_new(){
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outerTransaction = transactionManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.isNewTransaction()={}", outerTransaction.isNewTransaction()); // true
 
+        log.info("내부 트랜잭션 시작");
+        DefaultTransactionAttribute definition = new DefaultTransactionAttribute();
+        definition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+
+        // Suspending current transaction, creating new transaction with name [null]
+        // 외부 트랜잭션을 잠시 일시정지 후 새 트랜잭션 생성
+        TransactionStatus innerTransaction = transactionManager.getTransaction(definition); 
+        log.info("inner.isNewTransaction()={}", innerTransaction.isNewTransaction()); // true
+
+        log.info("내부 트랜잭션 롤백");
+        transactionManager.rollback(innerTransaction); // 신규 트랜잭션이니까 실제로 rollback 호출하고, 해당 트랜잭션은 반납
+
+        // Resuming suspended transaction after completion of inner transaction
+        // 내부 트랜잭션이 끝난 후 외부 트랜잭션을 다시 시작
+        log.info("외부 트랜잭션 커밋");
+        transactionManager.commit(outerTransaction);
 
     }
 }
