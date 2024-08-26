@@ -3,6 +3,8 @@ package com.example.springpractice.propagation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -13,8 +15,9 @@ public class MemberService {
 
     /**
      * 회원과 DB로그를 함께 남기는 비즈니스 로직
-     * 현재 별도의 트랜잭션 설정은 X
+     * 테스트 코드의 주석 참고 후 Transactional 를 세팅
      */
+    @Transactional
     public void joinV1(String username){
         Member member = new Member(username);
         Log logMessage = new Log(username);
@@ -32,7 +35,7 @@ public class MemberService {
     /**
      * 회원과 DB로그를 함께 남기는 비즈니스 로직
      * DB 로그 저장 시 예외 발생하면 예외 복구
-     * 현재 별도의 트랜잭션 설정은 X
+     * 테스트 코드의 주석 참고 후 Transactional 를 세팅
      */
     public void joinV2(String username){
         Member member = new Member(username);

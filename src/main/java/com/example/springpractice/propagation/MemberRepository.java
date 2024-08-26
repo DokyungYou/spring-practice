@@ -16,7 +16,8 @@ public class MemberRepository {
     private final EntityManager entityManager;
 
 
-    @Transactional
+    // 테스트 코드의 주석 참고 후 Transactional 를 세팅
+    //@Transactional
     public void save(Member member) {
         log.info("member 저장");
         entityManager.persist(member);
