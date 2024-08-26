@@ -96,4 +96,20 @@ public class BasicTxTest {
         log.info("외부 트랜잭션 커밋");
         transactionManager.commit(outerTransaction); // isNewTransaction 가 true 인 커넥션이기때문에 실제 commit 호출 (물리 커밋)
     }
+
+    @Test
+    void outer_rollback(){
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outerTransaction = transactionManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.isNewTransaction()={}", outerTransaction.isNewTransaction()); // 신규 트랜잭션 여부
+
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus innerTransaction = transactionManager.getTransaction(new DefaultTransactionAttribute()); // Participating in existing transaction
+        log.info("inner.isNewTransaction()={}", innerTransaction.isNewTransaction());
+        log.info("내부 트랜잭션 커밋");
+        transactionManager.commit(innerTransaction); // 여기서는 실제로 커밋을 하지 않는다. (트랜잭션 매니저는 커밋 시점에 신규 트랜잭션 여부에 따라 다르게 동작)
+
+        log.info("외부 트랜잭션 롤백");
+        transactionManager.rollback(outerTransaction); // 물리 롤백
+    }
 }
