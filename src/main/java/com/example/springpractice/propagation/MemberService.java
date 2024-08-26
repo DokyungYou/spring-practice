@@ -16,6 +16,8 @@ public class MemberService {
     /**
      * 회원과 DB로그를 함께 남기는 비즈니스 로직
      * 테스트 코드의 주석 참고 후 Transactional 를 세팅
+     *
+     * LogRepository 에서 예외발생 시 AOP 프록시에도 예외가 던져지는 상황  -> 롤백
      */
     @Transactional
     public void joinV1(String username){

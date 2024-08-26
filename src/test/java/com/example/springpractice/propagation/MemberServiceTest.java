@@ -102,4 +102,29 @@ class MemberServiceTest {
 
     }
 
+    /**
+     * joinV1 안에서 하나의 물리 트랜잭션으로 작동하는 상황 (트랜잭션 전파)
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional:ON Exception
+     *
+     * LogRepository 에서 예외발생 시 AOP 프록시에도 예외가 던져지는 상황  -> 전체 롤백
+     * LogRepository ->  AOP 프록시(LogRepository) -> MemberService -> AOP 프록시(MemberService) -> 클라이언트
+     */
+    @Test
+    void outerTxOn_fail() {
+        //given
+        String username = "outerTxOff_로그예외";
+
+        //when
+        // 전체 롤백
+        assertThatThrownBy(() -> memberService.joinV1(username))
+                .isInstanceOf(RuntimeException.class);
+
+        //then
+        Assertions.assertTrue(memberRepository.findByUsername(username).isEmpty());
+        Assertions.assertTrue(logRepository.find(username).isEmpty());
+
+    }
+
 }
