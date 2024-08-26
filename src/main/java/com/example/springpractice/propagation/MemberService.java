@@ -39,6 +39,7 @@ public class MemberService {
      * DB 로그 저장 시 예외 발생하면 예외 복구
      * 테스트 코드의 주석 참고 후 Transactional 를 세팅
      */
+    @Transactional
     public void joinV2(String username){
         Member member = new Member(username);
         Log logMessage = new Log(username);
