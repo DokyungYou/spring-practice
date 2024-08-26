@@ -1,6 +1,7 @@
 package com.example.springpractice.propagation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,9 +10,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 import javax.sql.DataSource;
+
+import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -111,5 +115,28 @@ public class BasicTxTest {
 
         log.info("외부 트랜잭션 롤백");
         transactionManager.rollback(outerTransaction); // 물리 롤백
+    }
+
+    @Test
+    void inner_rollback(){
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outerTransaction = transactionManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.isNewTransaction()={}", outerTransaction.isNewTransaction()); // 신규 트랜잭션 여부
+
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus innerTransaction = transactionManager.getTransaction(new DefaultTransactionAttribute()); // Participating in existing transaction
+        log.info("inner.isNewTransaction()={}", innerTransaction.isNewTransaction());
+        log.info("내부 트랜잭션 롤백");
+        transactionManager.rollback(innerTransaction); // Participating transaction failed - marking existing transaction as rollback-only
+        // 트랜잭션 동기화 매니저에 rollback-only 라고 표시 (신규 트랜잭션이 아니어서 물리 롤백은 호출 못함)
+
+        log.info("외부 트랜잭션 커밋");
+        //transactionManager.commit(outerTransaction); // Transaction rolled back because it has been marked as rollback-only
+
+        assertThatThrownBy(()-> transactionManager.commit(outerTransaction))
+                .isInstanceOf(UnexpectedRollbackException.class);
+
+
+
     }
 }
