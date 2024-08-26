@@ -13,6 +13,8 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 class MemberServiceTest {
 
+    // 테스트 코드의 주석을 참고해서 트랜잭션 세팅 후 테스트해야함
+    
     @Autowired
     MemberService memberService;
     @Autowired
@@ -153,6 +155,36 @@ class MemberServiceTest {
 
         //then
         Assertions.assertTrue(memberRepository.findByUsername(username).isEmpty());
+        Assertions.assertTrue(logRepository.find(username).isEmpty());
+
+    }
+
+    /** 로그에서 예외가 발생해도 회원가입이 가능하게끔 변경
+     * [MemberService, MemberRepository] <- 트랜잭션 분리 -> [LogRepository]
+     *
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository    @Transactional:ON(REQUIRES_NEW) Exception
+     *
+     * REQUIRES_NEW 옵션은 주의해서 사용 (커넥션 자원 소모문제)
+     *
+     * 메서드를 호출하는 구조자체를 변경하는 등의 방식도 있으니
+     * 상황에 따라서 장단점을 파악해서 적절하게 선택
+     */
+    @Test
+    void recoverException_success() {
+        //given
+        String username = "recoverException_success_로그예외";
+
+        //when
+        // 1. memberService 에서 새로운 트랜잭션 획득
+        // 2. memberRepository.save(member);에서 기존 트랜잭션 참여, 논리커밋
+        // 3. logRepository.save(logMessage); 새로운 트랜잭션 획득, 먼저 존재하던 트랜잭션 일시정지 , 현재 트랜잭션에 rollbackOnly 체크 -> 물리 롤백
+        // 4. 일시정지 했던 트랜잭션 다시 시작, rollbackOnly 여부 확인 -> false 인 상황 -> 물리 커밋
+        memberService.joinV2(username);
+
+        //then
+        Assertions.assertTrue(memberRepository.findByUsername(username).isPresent());
         Assertions.assertTrue(logRepository.find(username).isEmpty());
 
     }
