@@ -3,17 +3,26 @@ package com.example.springpractice.repository;
 import com.example.springpractice.domain.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Repository
 public class MemberRepository {
-    @PersistenceContext
-    private EntityManager entityManager;
+
+//    @PersistenceContext
+//    private EntityManager entityManager;
+
+    // 본래 EntityManager 는  @PersistenceContext 라는 표준 애노테이션이 있어야 주입이 가능한데,
+    // spring data JPA 가  자동주입도 가능하게 지원을 해주기때문에 생성자주입 가능
+    private final EntityManager entityManager;
 
     public void save(Member member){
-        entityManager.persist(member); // 영속성 컨텍스트에 member 엔티티를 넣은 후 트랜잭션이 commit 되는 시점에 db에 반영
+
+        // 영속성 컨텍스트에 member 엔티티를 올린 후 트랜잭션이 commit 되는 시점에 db에 반영
+        entityManager.persist(member);
     }
     public Member findOne(Long id){
         return entityManager.find(Member.class, id);
