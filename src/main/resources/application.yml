@@ -17,3 +17,4 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug  # logger를 통해 하이버네이트 실행 SQL을 남김 (주의: SQL 대문자여야함)
+    org.hibernate.orm.jdbc.bind: trace # SQL 실행 파라미터를 로그로 남김
