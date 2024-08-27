@@ -42,10 +42,16 @@ dependencies {
 
     //JPA, 스프링 데이터 JPA 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 
     runtimeOnly 'com.h2database:h2'
 
+
+    //JUnit4 추가
+    testImplementation("org.junit.vintage:junit-vintage-engine") {
+        exclude group: "org.hamcrest", module: "hamcrest-core"
+    }
 
 }
 
