@@ -2,10 +2,12 @@ package com.example.springpractice.domain;
 
 import com.example.springpractice.domain.item.Item;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.aspectj.weaver.ast.Or;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 엔티티를 createOrderItem() 로만 생성할 수 있게 하기 위함
 @Getter @Setter //Setter 지양
 @Entity
 public class OrderItem {

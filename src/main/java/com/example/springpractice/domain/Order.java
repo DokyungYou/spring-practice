@@ -3,7 +3,9 @@ package com.example.springpractice.domain;
 import com.example.springpractice.domain.enums.DeliveryStatus;
 import com.example.springpractice.domain.enums.OrderStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.util.List;
 
 import static com.example.springpractice.domain.enums.OrderStatus.*;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 엔티티를 createOrder() 로만 생성할 수 있게 하기 위함
 @Getter @Setter //Setter 지양
 @Table(name = "orders")
 @Entity
