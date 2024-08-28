@@ -1,5 +1,6 @@
 package com.example.springpractice.service;
 
+import com.example.springpractice.OrderSearch;
 import com.example.springpractice.domain.Delivery;
 import com.example.springpractice.domain.Member;
 import com.example.springpractice.domain.Order;
@@ -76,8 +77,10 @@ public class OrderService {
         order.cancel();
     }
 
-    // TODO 검색
-//    public List<Order> searchOrders(OrderSearch orderSearch){
-//    }
+
+    //검색
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAllByString(orderSearch);
+    }
 
 }
