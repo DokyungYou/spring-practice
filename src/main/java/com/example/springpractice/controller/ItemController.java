@@ -66,20 +66,33 @@ public class ItemController {
         return "/items/updateItemForm";
     }
 
+//    @PostMapping("/{itemId}/edit")
+//    public String updateItem(@ModelAttribute("form") BookForm form){
+//
+//        // setter 방식은 지양
+//        // 준영속엔티티, merge 방식 (이렇게 하면 안됨)
+//        Book book = new Book();
+//        book.setId(form.getId());
+//        book.setName(form.getName());
+//        book.setPrice(form.getPrice());
+//        book.setStockQuantity(form.getStockQuantity());
+//        book.setAuthor(form.getAuthor());
+//
+//        book.setIsbn(form.getIsbn());
+//        itemService.saveItem(book);
+//
+//        return "redirect:/items";
+//    }
+
+    /**
+     * 엔티티를 변경할 때는 항상 변경 감지를 사용해야함
+     * 트랜잭션이 있는 서비스 계층에서 영속 상태의 엔티티를 조회 후, 엔티티의 데이터를 직접 변경해야함
+     * 트랜잭션 커밋 시점에 변경 감지가 실행됨
+     */
     @PostMapping("/{itemId}/edit")
     public String updateItem(@ModelAttribute("form") BookForm form){
 
-        // setter 방식은 지양
-        Book book = new Book();
-        book.setId(form.getId());
-        book.setName(form.getName());
-        book.setPrice(form.getPrice());
-        book.setStockQuantity(form.getStockQuantity());
-        book.setAuthor(form.getAuthor());
-
-        book.setIsbn(form.getIsbn());
-        itemService.saveItem(book);
-
+        itemService.updateItem(form.getId(), form);
         return "redirect:/items";
     }
 }
