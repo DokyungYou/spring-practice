@@ -1,6 +1,7 @@
 package com.example.springpractice.domain.item;
 
 import com.example.springpractice.domain.Category;
+import com.example.springpractice.exception.NotEnoughStockException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,5 +32,22 @@ public abstract class Item {
 
     @ManyToMany(mappedBy = "items")
     private List<Category> categories = new ArrayList<>();
+
+
+    /** 도메인주도 설계
+     *  - 엔티티 자체가 해결할 수 있는 것들은 엔티티 안에 비즈니스 로직을 넣자
+     *  - 객체지향적
+     */
+    public void addStock(int quantity){
+        this.stockQuantity += quantity;
+    }
+
+    public void removeStock(int quantity){
+        int restStock = this.stockQuantity - quantity;
+        if (restStock < 0) {
+            throw new NotEnoughStockException("need more stock");
+        }
+        this.stockQuantity = restStock;
+    }
 
 }
