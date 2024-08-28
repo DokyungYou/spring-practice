@@ -1,6 +1,7 @@
 package com.example.springpractice.controller;
 
 import com.example.springpractice.domain.item.Book;
+import com.example.springpractice.domain.item.Item;
 import com.example.springpractice.repository.ItemRepository;
 import com.example.springpractice.service.ItemService;
 import jakarta.validation.Valid;
@@ -11,6 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -38,5 +41,12 @@ public class ItemController {
 
         itemService.saveItem(book);
         return "redirect:/items";
+    }
+
+    @GetMapping
+    public String list(Model model){
+        List<Item> items = itemService.findItems();
+        model.addAttribute("items", items);
+        return "/items/itemList";
     }
 }
