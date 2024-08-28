@@ -14,7 +14,7 @@ public class ItemRepository {
     private final EntityManager entityManager;
 
     public void save(Item item){
-        if(item.getId() != null){ // 새로 생성한 객체
+        if(item.getId() == null){ // 새로 생성한 객체
             entityManager.persist(item);
         } else{
             entityManager.merge(item);
