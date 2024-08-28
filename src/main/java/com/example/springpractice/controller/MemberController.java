@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RequestMapping("/members")
 @Controller
@@ -39,5 +41,22 @@ public class MemberController {
 
         memberService.join(member);
         return "redirect:/";
+    }
+
+
+    /**
+     * ssr 하는 경우에는 어차피 서버 안에서 돌기때문에
+     * 템플릿에 엔티티를 그대로 넘겨도 원하는 데이터만 출력하기때문에 큰 문제는 없으나
+     *
+     * api로 만들 때는 절대로 엔티티를 웹으로 반환하면 안된다. (외부 노출 X)
+     * - 중요한 데이터 노출
+     * - 엔티티의 구조에 변경이 생기면 api스펙 변동 -> 불안전 API 스펙이 됨
+     */
+    @GetMapping
+    public String list(Model model){
+
+        List<Member> members = memberService.findMembers(); 
+        model.addAttribute("members", members); // 엔티티를 그대로 넘기는 것은 지양
+        return "members/memberList";
     }
 }
