@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @RestController  // @ResponseBody + @Controller
@@ -54,6 +57,71 @@ public class MemberApiController {
         return new UpdateMemberResponse(updateMember.getId(), updateMember.getName());
     }
 
+    /** 엔티티를 그대로 반환받는 버전
+     *
+     * - Member의 Orders에 @JsonIgnore 적용 전 (FetchType.LAZY 인 상황)
+     * 그대로 받으면 N+1 (첫 Member 조회 쿼리(1) + Order 조회(N)),
+     *
+     * - Member 의 orders 를 @JsonIgnore 하였음
+     */
+    @GetMapping("/v1/members")
+    public List<Member> membersV1(){
+        List<Member> members = memberService.findMembers();
+        return members;
+    }
+
+
+    /**
+     * list를 collection으로 바로 내보내면 json 배열 타입으로 나가기때문에 유연성이 떨어지게 됨
+     * (json 가장 바깥 껍데기가 배열인 상황)
+     *
+     * [
+     *     {
+     *         "name": "회원1"
+     *     },
+     *     {
+     *         "name": "회원2"
+     *     },
+     *     {
+     *         "name": "회원3"
+     *     }
+     * ]
+     */
+    @GetMapping("/v2-1/members")
+    public List<MemberDto> membersV2_1(){
+        List<Member> members = memberService.findMembers();
+        return members.stream()
+                .map(member -> new MemberDto(member.getName()))
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * 추가로 Result 클래스로 컬렉션을 감싸서 향후 필요한 필드를 추가가능
+     *
+     * {
+     *     "count": 3,
+     *     "data": [
+     *         {
+     *             "name": "회원1"
+     *         },
+     *         {
+     *             "name": "회원2"
+     *         },
+     *         {
+     *             "name": "회원3"
+     *         }
+     *     ]
+     * }
+     */
+    @GetMapping("/v2-2/members")
+    public Result membersV2_2(){
+        List<Member> members = memberService.findMembers();
+        List<MemberDto> collect = members.stream()
+                .map(member -> new MemberDto(member.getName()))
+                .collect(Collectors.toList());
+        return new Result(collect.size(),collect);
+    }
 
     @Getter @Setter
     @NoArgsConstructor
@@ -87,6 +155,22 @@ public class MemberApiController {
     @AllArgsConstructor
     static class UpdateMemberResponse {
         private Long id;
+        private String name;
+    }
+
+
+    @Getter @Setter
+    @AllArgsConstructor
+    static class Result<T> {
+
+        private int count;
+        private T data;
+    }
+
+    @Getter @Setter
+    @AllArgsConstructor
+    static class MemberDto {
+
         private String name;
     }
 }
