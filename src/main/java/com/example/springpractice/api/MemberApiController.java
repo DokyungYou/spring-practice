@@ -5,10 +5,7 @@ import com.example.springpractice.service.MemberService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -37,6 +34,27 @@ public class MemberApiController {
         return new CreateMemberResponse(joinId);
     }
 
+    /**
+     * 해당 실습에서는 PUT 방식을 썻으나
+     * 부분 업데이트 시에는 PATCH 나 POST 사용하는 것이 REST 스타일에 적절
+     */
+    @PutMapping("/v2/members/{id}")
+    public UpdateMemberResponse updateMemberV2(
+            @PathVariable(value = "id") Long id,
+            @RequestBody @Valid UpdateMemberRequest request){
+
+        // 데이터 수정 시에는 가극적 변경 감지 활용
+
+        /*단순하게 pk 하나 찍어서 조회하는 것 정도는 특별하게 트래픽이 많은 api가 아니면 이슈가 안되기 때문에,
+         커맨드와 쿼리를 아래와 같이 분리하는 스타일로 개발하면
+         유지보수성이 많이 증대가 된다고 한다.*/
+        memberService.updateMember(id, request.getName());
+        Member updateMember = memberService.findOne(id);
+
+        return new UpdateMemberResponse(updateMember.getId(), updateMember.getName());
+    }
+
+
     @Getter @Setter
     @NoArgsConstructor
     static class CreateMemberRequest {
@@ -55,5 +73,20 @@ public class MemberApiController {
     @AllArgsConstructor
     static class CreateMemberResponse {
         private Long id;
+    }
+
+
+    @Getter @Setter
+    @NoArgsConstructor
+    static class UpdateMemberRequest {
+        @NotBlank
+        private String name;
+    }
+
+    @Getter @Setter
+    @AllArgsConstructor
+    static class UpdateMemberResponse {
+        private Long id;
+        private String name;
     }
 }

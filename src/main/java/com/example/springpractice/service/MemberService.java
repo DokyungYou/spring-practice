@@ -1,5 +1,6 @@
 package com.example.springpractice.service;
 
+import com.example.springpractice.api.MemberApiController;
 import com.example.springpractice.domain.Member;
 import com.example.springpractice.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +55,15 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member findOne(Long memberId){
         return memberRepository.findOne(memberId);
+    }
+
+    @Transactional
+    public void updateMember(Long id, String name) {
+
+        // 영속성 컨텍스트의 관리대상이 된다. (영속상태)
+        Member findMember = memberRepository.findOne(id);
+        findMember.setName(name);
+        // 변경 감지 -> 자동으로 업데이트 쿼리
+        // 트랜잭션 aop 가 끝나는 시점에 트랜잭션 커밋 후 -> JPA 가 플러시, 영속성 컨텍스트 커밋
     }
 }
