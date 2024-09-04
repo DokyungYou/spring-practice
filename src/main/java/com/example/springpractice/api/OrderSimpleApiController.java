@@ -81,6 +81,26 @@ public class OrderSimpleApiController {
         return collect;
     }
 
+    /** 패치 조인
+     *     from orders o
+     *     join member m on m.member_id = o.member_id
+     *     join delivery d on d.delivery_id = o.delivery_id
+     */
+    @GetMapping("/v3/simple-orders")
+    public List<SimpleOrderDto> ordersV3(){ // 반환값을 한번 더 클래스로 감싸는 것을 추천
+
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(new OrderSearch());
+
+        List<SimpleOrderDto> collect = orders.stream()
+                // .map(order -> new SimpleOrderDto(order))
+                .map(SimpleOrderDto::new)
+                .collect(Collectors.toList());
+
+        return collect;
+    }
+
+
+
 
     @Getter // 게터가 없으면 직렬화문제 발생
     @Setter

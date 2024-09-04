@@ -88,4 +88,20 @@ public class OrderRepository {
         TypedQuery<Order> query = entityManager.createQuery(cq).setMaxResults(100); //최대 100건
         return query.getResultList();
     }
+
+    /**
+     * 성능 문제의 90%는 N + 1문제
+     *
+     * 기본적으로 Lazy로 깔고 필요한 것만 패치조인으로
+     * 객체 그래프를 묶어서 db에서 한방에 가져오면 대부분의 성능 문제가 해결된다.
+     */
+    public List<Order> findAllWithMemberDelivery(OrderSearch orderSearch) {
+        // order를 가져올 때 객체그래프로 한 번에 가져오고 싶은 상황
+        // lazy를 무시하고 프록시가 아닌 실제 값을 채워서 가져옴
+       return entityManager.createQuery(
+                "select o from Order o" +
+                            " join fetch o.member" +
+                            " join fetch o.delivery", Order.class
+               ).getResultList();
+    }
 }
