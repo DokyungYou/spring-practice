@@ -8,7 +8,7 @@ import com.example.springpractice.domain.item.Book;
 import com.example.springpractice.domain.item.Item;
 import com.example.springpractice.exception.NotEnoughStockException;
 import com.example.springpractice.repository.ItemRepository;
-import com.example.springpractice.repository.OrderRepository;
+import com.example.springpractice.repository.order.OrderRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;

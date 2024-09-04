@@ -4,9 +4,13 @@ import com.example.springpractice.OrderSearch;
 import com.example.springpractice.domain.Address;
 import com.example.springpractice.domain.Order;
 import com.example.springpractice.domain.enums.OrderStatus;
-import com.example.springpractice.repository.OrderRepository;
-import lombok.*;
-import org.aspectj.weaver.ast.Or;
+import com.example.springpractice.repository.order.OrderRepository;
+import com.example.springpractice.repository.order.simpleQuery.OrderSimpleQueryDto;
+import com.example.springpractice.repository.order.simpleQuery.OrderSimpleQueryRepository;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     /** 엔티티를 그대로 노출하는 잘못된 방식이기때문에 아래 내용은 이런게 있구나~ 정도로 넘어가자..
      *
@@ -97,6 +102,16 @@ public class OrderSimpleApiController {
                 .collect(Collectors.toList());
 
         return collect;
+    }
+
+    /**
+     * JPA에서 DTO로 바로 조회
+     */
+    @GetMapping("/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4(){ // 반환값을 한번 더 클래스로 감싸는 것을 추천
+
+        List<OrderSimpleQueryDto> orders = orderSimpleQueryRepository.findOrdersDtos();
+        return orders;
     }
 
 

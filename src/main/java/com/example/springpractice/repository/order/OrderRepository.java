@@ -1,8 +1,9 @@
-package com.example.springpractice.repository;
+package com.example.springpractice.repository.order;
 
 import com.example.springpractice.OrderSearch;
 import com.example.springpractice.domain.Member;
 import com.example.springpractice.domain.Order;
+import com.example.springpractice.repository.order.simpleQuery.OrderSimpleQueryDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
@@ -94,6 +95,9 @@ public class OrderRepository {
      *
      * 기본적으로 Lazy로 깔고 필요한 것만 패치조인으로
      * 객체 그래프를 묶어서 db에서 한방에 가져오면 대부분의 성능 문제가 해결된다.
+     *
+     * OrderSimpleQueryRepository 의 findOrdersDtos() 와 비교:
+     * 기본적으로 조인하는 것까지는 성능이 같으나 select 절에서 데이터를 더 많이 가져옴 -> 그럼 findOrdersDtos()가 더 좋은가? 아니다. 트레이드오프
      */
     public List<Order> findAllWithMemberDelivery(OrderSearch orderSearch) {
         // order를 가져올 때 객체그래프로 한 번에 가져오고 싶은 상황
