@@ -45,6 +45,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
+    // 프록시 객체 -> json 관련 문제
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta'
 
     runtimeOnly 'com.h2database:h2'
 

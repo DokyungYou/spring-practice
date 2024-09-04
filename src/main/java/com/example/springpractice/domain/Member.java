@@ -23,11 +23,14 @@ public class Member {
     private Address address;
 
 
-    /** @JsonIgnore
+    /** @JsonIgnore 아래 api 실습시에만 적용하기
+     * - @GetMapping("/v1/members")
+     * - @GetMapping("/v1/simple-order")
+     *
      * 프레젠테이션 계층을 위한 로직이 추가돼버린 상황 (엔티티에서 의존관계가 나가버림)
      * 양방향으로 의존관계가 걸리면서 애플리케이션 수정이 어렵게 된 상황
      */
-    //@JsonIgnore  // @GetMapping("/v1/members") 실습시에만 적용
+    @JsonIgnore
     @OneToMany(mappedBy = "member") // order 테이블에 있는 member 필드에 의해 mapping
     private List<Order> orders = new ArrayList<>();
 

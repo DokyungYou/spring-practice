@@ -60,7 +60,8 @@ public class MemberApiController {
     /** 엔티티를 그대로 반환받는 버전
      *
      * - Member의 Orders에 @JsonIgnore 적용 전 (FetchType.LAZY 인 상황)
-     * 그대로 받으면 N+1 (첫 Member 조회 쿼리(1) + Order 조회(N)),
+     * 그대로 받으면 N+1 (첫 Member 조회 쿼리(1) + Order 조회(N)) - 이때는 db에 order데이터가 없던 상황이어서 무한루프가 발생하지는 않았음
+     * 
      *
      * - Member 의 orders 를 @JsonIgnore 하였음
      */

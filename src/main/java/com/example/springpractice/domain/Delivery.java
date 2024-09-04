@@ -1,6 +1,7 @@
 package com.example.springpractice.domain;
 
 import com.example.springpractice.domain.enums.DeliveryStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,11 @@ public class Delivery {
     @Column(name = "delivery_id")
     private Long id;
 
-    //@JsonIgnore
+
+    /**@JsonIgnore
+     * - @GetMapping("/v1/simple-order")
+     */
+    @JsonIgnore
     @OneToOne(mappedBy = "delivery", fetch = FetchType.LAZY)
     private Order order;
 
