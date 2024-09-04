@@ -15,8 +15,9 @@ public class Delivery {
     private Long id;
 
 
-    /**@JsonIgnore
+    /**@JsonIgnore 적용
      * - @GetMapping("/v1/simple-order")
+     * - @GetMapping("/v1/orders")
      */
     @JsonIgnore
     @OneToOne(mappedBy = "delivery", fetch = FetchType.LAZY)

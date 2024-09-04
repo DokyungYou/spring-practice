@@ -26,6 +26,7 @@ public class Member {
     /** @JsonIgnore 아래 api 실습시에만 적용하기
      * - @GetMapping("/v1/members")
      * - @GetMapping("/v1/simple-order")
+     * - @GetMapping("/v1/orders")
      *
      * 프레젠테이션 계층을 위한 로직이 추가돼버린 상황 (엔티티에서 의존관계가 나가버림)
      * 양방향으로 의존관계가 걸리면서 애플리케이션 수정이 어렵게 된 상황

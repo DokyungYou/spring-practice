@@ -24,6 +24,7 @@ public class OrderItem {
 
     /**@JsonIgnore 적용
      * - @GetMapping("/v1/simple-order")
+     * - @GetMapping("/v1/orders")
      */
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
