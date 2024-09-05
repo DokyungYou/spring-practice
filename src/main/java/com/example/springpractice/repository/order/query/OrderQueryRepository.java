@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -21,6 +23,44 @@ public class OrderQueryRepository {
             List<OrderItemQueryDto> orderItems = findOrderItems(o.getOrderId()); // N번
             o.setOrderItems(orderItems);
         });
+
+        return orders;
+    }
+
+    /**
+     * 최적화
+     * Query: 루트 1번, 컬렉션 1번
+     * 데이터를 한꺼번에 처리할 때 많이 사용하는 방식
+     *
+     */
+    public List<OrderQueryDto> findAllByDto_optimization() {
+
+        //루트 조회(toOne 코드를 모두 한번에 조회)
+        List<OrderQueryDto> orders = findOrders();
+
+        // orderId 추출
+        List<Long> orderIds = orders.stream()
+                .map(order -> order.getOrderId())
+                .collect(Collectors.toList());
+
+        // 추출한 orderId에 맞는 orderItems를 조회 (where in 으로 한번에 조회)
+        List<OrderItemQueryDto> orderItems = entityManager.createQuery(
+                        "select new com.example.springpractice.repository.order.query" +
+                                ".OrderItemQueryDto(oi.order.id, i.name, oi.orderPrice, oi.count)" +
+                                " from OrderItem oi" +
+                                " join oi.item i" +
+                                " where oi.order.id in :orderIds", OrderItemQueryDto.class)
+                .setParameter("orderIds", orderIds)
+                .getResultList();
+
+        // orderItem 컬렉션을 orderId 별로 분리
+        Map<Long, List<OrderItemQueryDto>> orderItemMap =
+                orderItems.stream()
+                        .collect(Collectors.groupingBy(OrderItemQueryDto::getOrderId));
+
+        // 루프를 돌면서 컬렉션 추가(추가 쿼리 실행X)
+        // 해당 orderId 에 맞는 orderItems를 세팅
+        orders.forEach(o -> o.setOrderItems(orderItemMap.get(o.getOrderId())));
 
         return orders;
     }

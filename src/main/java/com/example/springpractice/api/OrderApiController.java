@@ -155,7 +155,7 @@ public class OrderApiController {
      * join member m1_0 on m1_0.member_id=o1_0.member_id
      * join delivery d1_0on d1_0.delivery_id=o1_0.delivery_id
      * 
-     * (N)
+     * (N) - order 개수만큼 반복
      * from order_item oi1_0
      * join item i1_0 on i1_0.item_id=oi1_0.item_id where oi1_0.order_id=?
      * 
@@ -164,6 +164,22 @@ public class OrderApiController {
     @GetMapping("/v4/orders")
     public List<OrderQueryDto> ordersV4(){
         return orderQueryRepository.findOrderQueryDtos();
+    }
+
+    /**
+     * (1)
+     * from orders o1_0
+     * join member m1_0 on m1_0.member_id=o1_0.member_id
+     * join delivery d1_0 on d1_0.delivery_id=o1_0.delivery_id
+     *
+     * (1)
+     * from order_item oi1_0
+     * join item i1_0 on i1_0.item_id=oi1_0.item_id
+     * where oi1_0.order_id in (?, ?)
+     */
+    @GetMapping("/v5/orders")
+    public List<OrderQueryDto> ordersV5(){
+        return orderQueryRepository.findAllByDto_optimization();
     }
 
 
