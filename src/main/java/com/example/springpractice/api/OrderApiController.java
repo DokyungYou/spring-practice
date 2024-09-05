@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -66,7 +67,7 @@ public class OrderApiController {
      * order  1번
      * member , address  N번 (order 조회 수 만큼)
      * orderItem  N번  (order 조회 수 만큼)
-     * item  N번 (orderItem 조회 수 만큼)
+     * item  M번 (orderItem 조회 수 만큼)
      */
     @GetMapping("/v2/orders")
     public List<OrderDto> ordersV2(){
@@ -100,6 +101,39 @@ public class OrderApiController {
         for (Order order : orders) {
             log.info("order ref ={}, order id ={}", order, order.getId());
         }
+
+        List<OrderDto> collect = orders.stream()
+                //.map(order -> new OrderDto(order))
+                .map(OrderDto::new)
+                .collect(Collectors.toList());
+
+
+        return collect;
+    }
+
+    /**
+     * jpa.hibernate.hibernate.default_batch_fetch_size 설정
+     *
+     *
+     *  from orders o1_0
+     *  join member m1_0 on m1_0.member_id=o1_0.member_id
+     *  join delivery d1_0 on d1_0.delivery_id=o1_0.delivery_id
+     *  offset limit
+     *
+     *  -lazy 초기화 (배치)
+     *  from order_item oi1_0  where oi1_0.order_id in (? 배치 사이즈)
+     *
+     *  -lazy 초기화 (배치)
+     *  from item i1_0 where i1_0.item_id in (? 배치 사이즈)
+     */
+    @GetMapping("/v3.1/orders")
+    public List<OrderDto> ordersV3_page(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit
+            ){
+
+        // ToOne 관계인 애들은 페치조인으로 한방에 가져온다.
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
 
         List<OrderDto> collect = orders.stream()
                 //.map(order -> new OrderDto(order))

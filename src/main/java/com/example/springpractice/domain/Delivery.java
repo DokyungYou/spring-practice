@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
+@BatchSize(size = 1000)
 @Getter @Setter //Setter 지양
 @Entity
 public class Delivery {

@@ -14,6 +14,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * N + 1 실습 시에 default_batch_fetch_size 설정 off
+ */
 @RequiredArgsConstructor
 @Repository
 public class OrderRepository {
@@ -123,6 +126,7 @@ public class OrderRepository {
      *
      * db의 distinct는 모든 컬럼의 값이 완전히 동일한 경우에만 적용
      * JPA의 distinct는 SQL에 distinct를 추가하고, 더해서 같은 엔티티가 조회되면, 애플리케이션에서 중복을 걸러줌
+     * (결국 중복된 데이터 모두를 애플리케이션으로 끌고오기때문에 데이터 전송용 자체가 많아짐)
      *
      *
      * - 참고: 컬렉션 둘 이상에 페치 조인 사용하면 안됨(데이터 부정합하게 조회될 가능성)
@@ -185,5 +189,22 @@ public class OrderRepository {
                 .setMaxResults(100)
                 .getResultList();
 
+    }
+
+
+    /**
+     *
+     */
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+
+        // order입장에서 ToOne 관계인 member, delivery 는 페치조인으로 가져온다.
+        // ToMany 관계는 lazy
+        return entityManager.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member" +
+                        " join fetch o.delivery", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 }
