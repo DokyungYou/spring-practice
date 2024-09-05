@@ -108,4 +108,82 @@ public class OrderRepository {
                             " join fetch o.delivery", Order.class
                ).getResultList();
     }
+
+
+    /** 
+     * 컬렉션 페치 조인
+     * 
+     * 이런 식으로 order 가 중복돼서 조회 (order에 속한 orderItem 개수만큼 중복)
+     * order_id | item_id
+     * 1            1
+     * 1            2
+     * 2            3
+     * 2            4
+     *
+     *
+     * db의 distinct는 모든 컬럼의 값이 완전히 동일한 경우에만 적용
+     * JPA의 distinct는 SQL에 distinct를 추가하고, 더해서 같은 엔티티가 조회되면, 애플리케이션에서 중복을 걸러줌
+     *
+     *
+     * - 참고: 컬렉션 둘 이상에 페치 조인 사용하면 안됨(데이터 부정합하게 조회될 가능성)
+     * row가 많아지는 문제를 떠나서 어떤 기준으로 데이터를 끌고와야할지를 모르게 될 수 있음
+     *
+     */
+    public List<Order> findAllWithItem() {
+
+        // 한 order에 여러개의 orderItem 있는 상태에서 조인을 하면 orderItem개수만큼 order가 중복됨
+        // -> 가져오는 데이터가 배가 되어 온다..
+
+        // distinct를 넣어줌으로 중복데이터 제거 (스프링부트3(하이버네이트 6버전)일 경우 안 적어도 distinct 자동적용)
+        return entityManager.createQuery(
+                "select distinct o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d" +
+
+                        " join fetch o.orderItems oi" +
+                        " join fetch oi.item i", Order.class
+        ).getResultList();
+
+    }
+
+    /**
+     * 컬렉션 페치 조인 주의점 - db에서 페이징 불가
+     * 해당 쿼리를 날리면 db에서는 distinct 적용이 안되기때문에 일단 데이터가 중복된 상태로 조회 ( order의 기준자체가 틀어져버린다 )
+     * 
+     * -> 예를들어 order를 기준으로 페이징해서 2개의 데이터를 가져오고싶다.
+     *  order_id | item_id
+     *  1            1
+     *  1            2
+     *  2            3
+     *  2            4
+     *
+     * -> 우리가 원하는 결과는 order_id가 1인 데이터1개,  order_id가 2인 데이터1개
+     * 그러나 order_id가 1인 데이터2개를 가져와버리게 되는 것임
+     *
+     * -> 컬렉션 페치 조인 시 order의 기준자체가 틀어져버려서 제대로 된 페이징이 불가
+     * -> order를 기준으로 limit 하고 싶었으나 order_item을 기준으로 limit돼버림
+     * 
+     *
+     * 그래서 결국
+     * 하이버네이트는 경고 로그를 남기면서 모든 데이터를 DB에서 읽어오고 애플리케이션으로 다 가져와버린 후
+     * 메모리에서 페이징(매우 위험 , 메모리 부족)
+     *
+     * 자세한 내용은 자바 ORM 표준 JPA 프로그래밍 의 페치 조인 부분을 참고
+     */
+    public List<Order> findAllWithItemPaging() {
+
+        return entityManager.createQuery(
+                "select distinct o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d" +
+
+                        " join fetch o.orderItems oi" +
+                        " join fetch oi.item i", Order.class)
+                
+                // 페이징
+                .setFirstResult(1)
+                .setMaxResults(100)
+                .getResultList();
+
+    }
 }

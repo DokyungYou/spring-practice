@@ -8,6 +8,7 @@ import com.example.springpractice.domain.enums.OrderStatus;
 import com.example.springpractice.repository.order.OrderRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @RestController
@@ -74,6 +76,37 @@ public class OrderApiController {
                 //.map(order -> new OrderDto(order))
                 .map(OrderDto::new)
                 .collect(Collectors.toList());
+        return collect;
+    }
+
+    /** 컬렉션 페치 조인 적용 버전
+     *
+     * InitDb 세팅한 ORDER은 2개인 상황 ( 2개가 서로 다른 구매자(Member), ORDER 하나당 서로다른 item 2개씩 세팅 )
+     *
+     * from orders o1_0
+     *  join member m1_0 on m1_0.member_id=o1_0.member_id
+     *  join delivery d1_0 on d1_0.delivery_id=o1_0.delivery_id
+     *
+     * orderItem개수만큼 order가 중복된 상태로 조회 (조회 row 4개 -> json도 2개의 order가 아닌 4개가 나오게 됨)
+     * 참고: 스프링부트3(하이버네이트 6버전)일 경우 distinct 자동적용돼서 2개로 조회)
+     *
+     *  join order_item oi1_0 on o1_0.order_id=oi1_0.order_id
+     *  join item i1_0 on i1_0.item_id=oi1_0.item_id
+     */
+    @GetMapping("/v3/orders")
+    public List<OrderDto> ordersV3(){
+        List<Order> orders = orderRepository.findAllWithItem();
+
+        for (Order order : orders) {
+            log.info("order ref ={}, order id ={}", order, order.getId());
+        }
+
+        List<OrderDto> collect = orders.stream()
+                //.map(order -> new OrderDto(order))
+                .map(OrderDto::new)
+                .collect(Collectors.toList());
+
+
         return collect;
     }
 
