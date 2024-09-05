@@ -86,4 +86,16 @@ public class OrderQueryRepository {
                                 " join o.delivery d", OrderQueryDto.class)
                 .getResultList();
     }
+
+    public List<OrderFlatDto> findAllByDto_flat() {
+
+        return entityManager.createQuery("select new com.example.springpractice.repository.order.query.OrderFlatDto(" +
+                "o.id, m.name,o.orderDateTime, o.status, d.address, i.name, i.price, oi.count)" +
+                " from Order o " +
+                " join o.member m " +
+                " join o.delivery d " +
+                " join o.orderItems oi " +  // 데이터 뻥튀기
+                " join oi.item i",  // 데이터 뻥튀기
+                        OrderFlatDto.class).getResultList();
+    }
 }
