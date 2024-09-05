@@ -6,6 +6,9 @@ import com.example.springpractice.domain.Order;
 import com.example.springpractice.domain.OrderItem;
 import com.example.springpractice.domain.enums.OrderStatus;
 import com.example.springpractice.repository.order.OrderRepository;
+import com.example.springpractice.repository.order.query.OrderQueryDto;
+import com.example.springpractice.repository.order.query.OrderQueryRepository;
+import com.example.springpractice.repository.order.simpleQuery.OrderSimpleQueryDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     /** 엔티티 직접 노출
      * - 양방향 관계 문제 발생 (json 무한루프 )-> @JsonIgnore
@@ -143,6 +147,25 @@ public class OrderApiController {
 
         return collect;
     }
+
+    /** Order이 2개인 상태
+     *
+     * (1)
+     * from orders o1_0
+     * join member m1_0 on m1_0.member_id=o1_0.member_id
+     * join delivery d1_0on d1_0.delivery_id=o1_0.delivery_id
+     * 
+     * (N)
+     * from order_item oi1_0
+     * join item i1_0 on i1_0.item_id=oi1_0.item_id where oi1_0.order_id=?
+     * 
+     * ToOne 관계는 먼저 조회 후 ToMany 관계는 각각 별도처리
+     */
+    @GetMapping("/v4/orders")
+    public List<OrderQueryDto> ordersV4(){
+        return orderQueryRepository.findOrderQueryDtos();
+    }
+
 
     @Getter
     static class OrderDto {

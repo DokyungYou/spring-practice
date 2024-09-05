@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
-@BatchSize(size = 1000)
+//@BatchSize(size = 1000)
 @Getter @Setter //Setter 지양
 @Entity
 public class Delivery {
