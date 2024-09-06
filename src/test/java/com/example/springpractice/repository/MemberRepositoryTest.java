@@ -1,6 +1,7 @@
 package com.example.springpractice.repository;
 
 import com.example.springpractice.entity.Member;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 @Transactional
 @Rollback(false)
@@ -18,6 +20,8 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
     @Test
     public void testMember() {
+
+        log.info("memberRepository = {}", memberRepository.getClass()); // class jdk.proxy3.$Proxy131
         Member member = new Member("memberA");
         Member savedMember = memberRepository.save(member);
         Member findMember = memberRepository.findById(savedMember.getId()).get(); // 바로 꺼내는 방식 지양
