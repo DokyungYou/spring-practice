@@ -1,6 +1,8 @@
 package com.example.springpractice.repository;
 
+import com.example.springpractice.dto.MemberDto;
 import com.example.springpractice.entity.Member;
+import com.example.springpractice.entity.Team;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -9,9 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @SpringBootTest
@@ -20,6 +23,9 @@ import static org.assertj.core.api.Assertions.*;
 class MemberRepositoryTest {
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    TeamRepository teamRepository;
+
     @Test
     public void testMember() {
 
@@ -123,6 +129,43 @@ class MemberRepositoryTest {
         List<Member> members2 = memberRepository.findUserByUsernameAndAge("멤버2",30);
         assertThat(members1.get(0)).isEqualTo(member1);
         assertThat(members2.get(0)).isEqualTo(member2);
+    }
+
+    @Test
+    void findUsernameList() {
+
+        Member member1 = new Member("멤버1",10);
+        Member member2 = new Member("멤버2", 30);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        Set<String> nameSet = new HashSet<>(Set.of(member1.getUsername(), member2.getUsername()));
+
+        List<String> userNameList = memberRepository.findUsernameList();
+        for (String name : userNameList) {
+            assertTrue(nameSet.contains(name));
+        }
+
+    }
+
+    @Test
+    void findMemberDtoList() {
+
+        Team team1 = new Team("팀1");
+        Team team2 = new Team("팀2");
+        teamRepository.save(team1);
+        teamRepository.save(team2);
+
+        Member member1 = new Member("멤버1",10, team1);
+        Member member2 = new Member("멤버2", 30, team2);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<MemberDto> memberDtoList = memberRepository.findMemberDtoList();
+        for (MemberDto memberDto : memberDtoList) {
+            log.info("memberDto= {}", memberDto);
+        }
+
     }
 
 }
