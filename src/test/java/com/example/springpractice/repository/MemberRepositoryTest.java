@@ -181,6 +181,29 @@ class MemberRepositoryTest {
         for (Member findMember : findMembers) {
             log.info("findMember= {}", findMember);
         }
+    }
 
+    @Test
+    void returnTypeTest() {
+        Member member1 = new Member("멤버1");
+        Member member2 = new Member("중복이름");
+        Member member3 = new Member("중복이름");
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+
+        List<Member> members = memberRepository.findListByUsername(member1.getUsername());
+        Member findMember = memberRepository.findMemberByUsername(member1.getUsername());
+        Optional<Member> memberOptional = memberRepository.findMemberOptionalByUsername(member1.getUsername());
+
+        assertThat(members.get(0)).isEqualTo(member1);
+        assertThat(findMember).isEqualTo(member1);
+        assertThat(memberOptional.get()).isEqualTo(member1);
+
+
+        // Spring Data Jpa 가 원인인 예외를 Spring Framework Exception 으로 변환 후 반환
+        // org.springframework.dao.IncorrectResultSizeDataAccessException: Query did not return a unique result: 2 results were returned
+        // Caused by: org.hibernate.NonUniqueResultException: Query did not return a unique result: 2 results were returned
+        //Optional<Member> memberOptionalByUsername = memberRepository.findMemberOptionalByUsername("중복이름");
     }
 }

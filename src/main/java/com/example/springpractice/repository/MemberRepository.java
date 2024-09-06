@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository // 생략가능
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -38,4 +39,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query(value = "select m from Member m where m.username in :names")
     List<Member> findByNames(@Param("names") Collection<String> names);
+
+    List<Member> findListByUsername(String username); // 컬렉션
+    Member findMemberByUsername(String username); // 단건
+    Optional<Member> findMemberOptionalByUsername(String username); // Optional 단건
 }
