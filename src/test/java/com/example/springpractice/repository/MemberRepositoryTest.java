@@ -58,4 +58,44 @@ class MemberRepositoryTest {
         assertThat(memberRepository.count()).isEqualTo(0);
 
     }
+
+    @Test
+    public void findByUserNameAgeGreaterThen() {
+
+        Member member1 = new Member("멤버",10);
+        Member member2 = new Member("멤버", 30);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<Member> members = memberRepository.findByUsernameAndAgeGreaterThan("멤버", 20);
+        assertThat(members.size()).isEqualTo(1);
+        assertThat(members.get(0).getAge()).isEqualTo(30);
+        assertThat(members.get(0).getUsername()).isEqualTo("멤버");
+    }
+
+    @Test
+    public void findHelloBy() {
+        Member member1 = new Member("멤버",10);
+        Member member2 = new Member("멤버", 30);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<Member> members = memberRepository.findHelloBy();
+        assertThat(members.size()).isEqualTo(2);
+    }
+
+    @Test
+    public void findTop3HelloBy() {
+        Member member1 = new Member("멤버",10);
+        Member member2 = new Member("멤버", 30);
+        Member member3 = new Member("멤버", 30);
+        Member member4 = new Member("멤버", 30);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        memberRepository.save(member3);
+        memberRepository.save(member4);
+
+        List<Member> members = memberRepository.findTop3HelloBy();
+        assertThat(members.size()).isEqualTo(3);
+    }
 }
