@@ -10,7 +10,7 @@ import com.example.springpractice.repository.order.query.OrderFlatDto;
 import com.example.springpractice.repository.order.query.OrderItemQueryDto;
 import com.example.springpractice.repository.order.query.OrderQueryDto;
 import com.example.springpractice.repository.order.query.OrderQueryRepository;
-import com.example.springpractice.repository.order.simpleQuery.OrderSimpleQueryDto;
+import com.example.springpractice.repository.order.query.OrderQueryService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -33,6 +32,7 @@ public class OrderApiController {
 
     private final OrderRepository orderRepository;
     private final OrderQueryRepository orderQueryRepository;
+    private final OrderQueryService queryService;
 
     /** 엔티티 직접 노출
      * - 양방향 관계 문제 발생 (json 무한루프 )-> @JsonIgnore
@@ -208,8 +208,23 @@ public class OrderApiController {
     }
 
 
+    /**
+     * jpa.open-in-view: false
+     * 
+     * lazy 초기화 등의 로직을 트랜잭션 내에서 수행해야함
+     */
+    @GetMapping("/v3.1-osiv-off/orders")
+    public List<OrderDto> ordersOsivOff(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit
+    ){
+        List<OrderDto> orderDtos = queryService.ordersOsivOff(offset, limit);
+        return orderDtos;
+    }
+
+
     @Getter
-    static class OrderDto {
+    public static class OrderDto {
         private Long orderId;
         private String name;
         private LocalDateTime orderedAt;
@@ -233,8 +248,11 @@ public class OrderApiController {
         }
     }
 
+
+
+
     @Getter
-    static class OrderItemDto {
+    public static class OrderItemDto {
 
         private String itemName;
         private int orderPrice;
