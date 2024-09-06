@@ -22,4 +22,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query(name = "Member.findByUsername")
     List<Member> findNamedByUsername(@Param("username") String username);
+
+
+
+    // JPA Named 쿼리처럼 애플리케이션 실행 시점에 문법 오류를 발견할 수 있음
+    @Query(value = "select m from Member m where m.username = :username and m.age = :age")
+    List<Member> findUserByUsernameAndAge(@Param("username") String username, @Param("age") int age);
 }

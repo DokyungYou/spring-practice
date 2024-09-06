@@ -110,4 +110,19 @@ class MemberRepositoryTest {
         List<Member> members = memberRepository.findNamedByUsername("멤버");
         assertThat(members.size()).isEqualTo(2);
     }
+
+    @Test
+    void testQuery() {
+
+        Member member1 = new Member("멤버1",10);
+        Member member2 = new Member("멤버2", 30);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<Member> members1 = memberRepository.findUserByUsernameAndAge("멤버1",10);
+        List<Member> members2 = memberRepository.findUserByUsernameAndAge("멤버2",30);
+        assertThat(members1.get(0)).isEqualTo(member1);
+        assertThat(members2.get(0)).isEqualTo(member2);
+    }
+
 }
