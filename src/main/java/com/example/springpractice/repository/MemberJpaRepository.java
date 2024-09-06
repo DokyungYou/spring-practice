@@ -5,6 +5,9 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Repository
 public class MemberJpaRepository {
@@ -17,7 +20,27 @@ public class MemberJpaRepository {
         return member;
     }
 
+    public void delete(Member member){
+        entityManager.remove(member);
+    }
+
     public Member find(Long id) {
         return entityManager.find(Member.class, id);
+    }
+
+    public Optional<Member> findById(Long id){
+        return Optional.ofNullable(entityManager.find(Member.class, id));
+    }
+
+    public List<Member> findAll(){
+        return entityManager
+                .createQuery("select m from Member m ", Member.class)
+                .getResultList();
+    }
+
+    public long count(){
+        return entityManager
+                .createQuery("select count(m) from Member m", Long.class)
+                .getSingleResult();
     }
 }
