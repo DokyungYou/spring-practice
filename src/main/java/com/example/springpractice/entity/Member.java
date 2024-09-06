@@ -3,6 +3,9 @@ package com.example.springpractice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+@NamedQuery(
+        name="Member.findByUsername",
+        query="select m from Member m where m.username = :username")
 @Getter @Setter // setter 지양
 @ToString(of = {"id","username","age"}) // team은 무한루프 때문에 제외 (가급적 연관관계 없는 내부 필드만)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

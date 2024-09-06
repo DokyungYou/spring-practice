@@ -98,4 +98,16 @@ class MemberRepositoryTest {
         List<Member> members = memberRepository.findTop3HelloBy();
         assertThat(members.size()).isEqualTo(3);
     }
+
+    @Test
+    void testNamedQuery() {
+
+        Member member1 = new Member("멤버",10);
+        Member member2 = new Member("멤버", 30);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        List<Member> members = memberRepository.findNamedByUsername("멤버");
+        assertThat(members.size()).isEqualTo(2);
+    }
 }
