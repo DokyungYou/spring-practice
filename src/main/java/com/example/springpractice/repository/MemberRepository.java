@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository // 생략가능
@@ -34,4 +35,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query(value = "select new com.example.springpractice.dto.MemberDto(m.id, m.username, t.name) from Member m join m.team t")
     List<MemberDto> findMemberDtoList();
+
+    @Query(value = "select m from Member m where m.username in :names")
+    List<Member> findByNames(@Param("names") Collection<String> names);
 }

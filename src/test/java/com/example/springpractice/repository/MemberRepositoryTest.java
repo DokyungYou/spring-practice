@@ -168,4 +168,19 @@ class MemberRepositoryTest {
 
     }
 
+    @Test
+    void findByNames() {
+
+        List<String> names = new ArrayList<>(List.of("멤버1", "멤버2","멤버3","멤버4"));
+
+        for (String name : names) {
+            memberRepository.save(new Member(name));
+        }
+
+        List<Member> findMembers = memberRepository.findByNames(names);
+        for (Member findMember : findMembers) {
+            log.info("findMember= {}", findMember);
+        }
+
+    }
 }
