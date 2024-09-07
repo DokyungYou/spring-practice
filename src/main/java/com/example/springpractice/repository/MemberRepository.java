@@ -2,6 +2,9 @@ package com.example.springpractice.repository;
 
 import com.example.springpractice.dto.MemberDto;
 import com.example.springpractice.entity.Member;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -43,4 +46,20 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findListByUsername(String username); // 컬렉션
     Member findMemberByUsername(String username); // 단건
     Optional<Member> findMemberOptionalByUsername(String username); // Optional 단건
+
+
+    /** 카운트 쿼리 분리 - 복잡한 sql에서 사용 (실무에서 매우 중요!!!)
+     * ex) 데이터는 left join, 카운트는 left join 안해도 됨
+     * 전체 count 쿼리는 비교적 매우 무겁기 때문에, 복잡한 join 과정까지 한다면...
+     *
+     * 성능테스트를 해본 후 느리다싶으면 이런식으로 고치면 된다.
+     *
+     * 정렬이 복잡하면 PageRequest에 넣는 정렬조건으로는 해결 X,
+     * 조건이 복잡해지면 과감하게 쿼리에 조건을 넣도록 하자
+     * */
+    @Query(value = "select m from Member m left join m.team t",
+            countQuery = "select count(m.username) from Member m")
+    Page<Member> findPageByAge(int age, Pageable pageable);
+
+    Slice<Member> findSliceByAge(int age, Pageable pageable);
 }

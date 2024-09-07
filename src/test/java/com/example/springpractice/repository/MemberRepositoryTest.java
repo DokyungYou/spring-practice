@@ -8,6 +8,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -205,5 +209,91 @@ class MemberRepositoryTest {
         // org.springframework.dao.IncorrectResultSizeDataAccessException: Query did not return a unique result: 2 results were returned
         // Caused by: org.hibernate.NonUniqueResultException: Query did not return a unique result: 2 results were returned
         //Optional<Member> memberOptionalByUsername = memberRepository.findMemberOptionalByUsername("중복이름");
+    }
+
+    @Test
+    void paging_page() {
+
+        memberRepository.save(new Member("중학생0",11));
+        memberRepository.save(new Member("중학생1",15));
+        memberRepository.save(new Member("중학생2",15));
+        memberRepository.save(new Member("중학생3",15));
+        memberRepository.save(new Member("중학생4",15));
+        memberRepository.save(new Member("중학생5",15));
+
+
+        int age = 15;
+
+        // 페이지는 1이 아닌 0부터 시작
+        PageRequest pageRequest1 =
+                PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        PageRequest pageRequest2 =
+                PageRequest.of(1, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        PageRequest pageRequest3 =
+                PageRequest.of(2, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        Page<Member> page1 = memberRepository.findPageByAge(age, pageRequest1);
+        Page<Member> page2 = memberRepository.findPageByAge(age, pageRequest2);
+        Page<Member> page3 = memberRepository.findPageByAge(age, pageRequest3);
+
+        // 총 페이지, 데이터 개수
+        assertThat(page1.getTotalPages()).isEqualTo(2);
+        assertThat(page1.getTotalElements()).isEqualTo(5);
+
+        // 해당 페이지에 있는 데이터 개수
+        assertThat(page1.getContent().size()).isEqualTo(3);
+        assertThat(page2.getContent().size()).isEqualTo(2);
+        assertThat(page3.getContent().size()).isEqualTo(0);
+
+        // 해당 페이지 번호
+        assertThat(page1.getNumber()).isEqualTo(0);
+        assertThat(page2.getNumber()).isEqualTo(1);
+        assertThat(page2.getNumber()).isEqualTo(2); // 데이터가 없는 페이지
+
+        // 페이지를 유지하면서 엔티티 -> DTO 변환
+        Page<MemberDto> map = page1.map(m -> new MemberDto(m.getId(), m.getUsername(), m.getTeam().getName()));
+
+    }
+
+    @Test
+    void paging_slice() {
+
+        memberRepository.save(new Member("중학생0",11));
+        memberRepository.save(new Member("중학생1",15));
+        memberRepository.save(new Member("중학생2",15));
+        memberRepository.save(new Member("중학생3",15));
+        memberRepository.save(new Member("중학생4",15));
+        memberRepository.save(new Member("중학생5",15));
+
+
+        int age = 15;
+
+        // 페이지는 1이 아닌 0부터 시작
+        PageRequest pageRequest1 =
+                PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        PageRequest pageRequest2 =
+                PageRequest.of(1, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        PageRequest pageRequest3 =
+                PageRequest.of(2, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        Slice<Member> page1 = memberRepository.findSliceByAge(age, pageRequest1);
+        Slice<Member> page2 = memberRepository.findSliceByAge(age, pageRequest2);
+        Slice<Member> page3 = memberRepository.findSliceByAge(age, pageRequest3);
+
+
+        // 해당 페이지에 있는 데이터 개수
+        assertThat(page1.getContent().size()).isEqualTo(3);
+        assertThat(page2.getContent().size()).isEqualTo(2);
+        assertThat(page3.getContent().size()).isEqualTo(0);
+
+        // 해당 페이지 번호
+        assertThat(page1.getNumber()).isEqualTo(0);
+        assertThat(page2.getNumber()).isEqualTo(1);
+        assertThat(page2.getNumber()).isEqualTo(1); // 데이터가 없는 페이지
+
     }
 }
