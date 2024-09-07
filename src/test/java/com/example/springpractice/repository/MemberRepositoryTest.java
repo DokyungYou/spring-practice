@@ -3,6 +3,7 @@ package com.example.springpractice.repository;
 import com.example.springpractice.dto.MemberDto;
 import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.Team;
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ class MemberRepositoryTest {
     MemberRepository memberRepository;
     @Autowired
     TeamRepository teamRepository;
+
+    @Autowired
+    EntityManager entityManager;     // 같은 트랜잭션이면 같은 엔티티 매니저가 동작
 
     @Test
     public void testMember() {
@@ -295,5 +299,30 @@ class MemberRepositoryTest {
         assertThat(page2.getNumber()).isEqualTo(1);
         assertThat(page2.getNumber()).isEqualTo(1); // 데이터가 없는 페이지
 
+    }
+
+
+    // TODO 복습 & 정리 + JPA 기본편 복습..
+    @Test
+    public void bulkUpdate() {
+
+        memberRepository.save(new Member("회원1", 10));
+        memberRepository.save(new Member("회원2", 110));
+        memberRepository.save(new Member("회원3", 120));
+        memberRepository.save(new Member("회원4", 130));
+        memberRepository.save(new Member("회원5", 14));
+
+        // bulk 연산 시 영속성 컨텍스트를 무시하고 바로 db에 적용하고, 영속성 컨텍스트는 그 사실을 모른다.
+        // bulk 연산 후엔 영속성 컨텍스트를 다 비워야한다.
+        int resultCount = memberRepository.bulkAgePlus(100);
+        Member member = memberRepository.findMemberByUsername("회원4");
+        log.info("age of member ={}", member.getAge()); // 130,  @Modifying(clearAutomatically = true) 적용 후엔 131
+
+        // entityManager.clear(); // @Modifying(clearAutomatically = true) 적용 시 자동 적용
+
+        Member findMember = memberRepository.findMemberByUsername("회원4");
+        log.info("age of findMember4 ={}", findMember.getAge()); //131
+
+        assertThat(resultCount).isEqualTo(3);
     }
 }
