@@ -430,4 +430,34 @@ class MemberRepositoryTest {
         }
 
     }
+
+    @Test
+    void queryHint() {
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        entityManager.flush();
+        entityManager.clear();
+
+//        Member findMember = memberRepository.findById(member1.getId()).get();// get으로 바로 꺼내는 것 지양
+//        findMember.setAge(11);
+        // db 에 반영 시에 변경감지를 하는데, 변경감지를 하려면 원본이 있어야한다. (객체를 두 개 관리하는 것임, 메모리를 더 먹음)
+
+
+        // readOnly를 적용 시 내부적으로 최적화 (스냅샷을 만들지 않음)
+        Member findMember = memberRepository.findReadOnlyByUsername(member1.getUsername());
+        findMember.setAge(11); // readOnly를 적용한 메서드로 조회했기때문에 변경 무시 -> 변경감지 체크X
+
+        entityManager.flush();
+    }
+
+    @Test
+    void lock() {
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        entityManager.flush();
+        entityManager.clear();
+
+        Member findMember = memberRepository.findReadOnlyByUsername(member1.getUsername());
+        findMember.setAge(11);
+
+        entityManager.flush();
+    }
 }

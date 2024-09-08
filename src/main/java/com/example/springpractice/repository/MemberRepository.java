@@ -2,13 +2,12 @@ package com.example.springpractice.repository;
 
 import com.example.springpractice.dto.MemberDto;
 import com.example.springpractice.entity.Member;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -96,4 +95,17 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //@EntityGraph(attributePaths = {"team"})
     @EntityGraph("Member.all") // NamedEntityGraph
     List<Member> findEntityGraphByUsername(String username);
+
+
+    /** @QueryHints
+     * 해당 기능을 사용하면서 얻는 이점이 생각보다 크지 않음 (애매함)
+     * 무작정 적용하지말고 성능테스트 하고, 상황판단해서 결정
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByUsername(String username);
+
+
+    //TODO 비교적 깊은 내용이기때문에 자세한 부분은 책 참고
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUsername(String username);
 }
