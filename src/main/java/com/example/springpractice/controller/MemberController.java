@@ -76,9 +76,20 @@ public class MemberController {
     }
 
 
+    /**
+     * @Transactional 트랜잭션 적용
+     * JPA의 모든 변경은 트랜잭션 안에서 동작
+     * 스프링 데이터 JPA는 변경(등록, 수정, 삭제) 메서드를 트랜잭션 처리
+     * 서비스 계층에서 트랜잭션을 시작하지 않으면 레파지토리에서 트랜잭션 시작
+     * 서비스 계층에서 트랜잭션을 시작하면 레파지토리는 해당 트랜잭션을 전파 받아서 사용
+     * 그래서 스프링 데이터 JPA를 사용할 때 트랜잭션이 없어도 데이터 등록, 변경이 가능했음(사실은 트랜잭션 이 리포지토리 계층에 걸려있는 것임)
+     */
     @PostConstruct
     public void init(){
         for (int i = 1; i < 100; i++) {
+
+            // JPA의 모든 데이터의 변경은 트랜잭션 내에서 이루어져야하는데, 현재 init 메서드에 @Transactional 적용하지 않았음에도 문제가 없는이유
+            // 구현체인 SimpleJpaRepository 을 들어가보면 제공하는 메서드들에  @Transactional 가 적용돼있는 것을 볼 수 있음
             memberRepository.save(new Member("멤버" + i, i));
         }
     }
