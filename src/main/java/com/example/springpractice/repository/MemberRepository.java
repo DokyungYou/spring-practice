@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository // 생략가능
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
     /**

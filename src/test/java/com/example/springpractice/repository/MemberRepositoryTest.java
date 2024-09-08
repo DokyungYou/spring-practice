@@ -460,4 +460,9 @@ class MemberRepositoryTest {
 
         entityManager.flush();
     }
+
+    @Test
+    void callCustom() {
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
 }
