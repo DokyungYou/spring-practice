@@ -1,9 +1,11 @@
 package com.example.springpractice.entity;
 
+import com.example.springpractice.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberTest {
     @PersistenceContext
     EntityManager entityManager;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     /**
      * 연관관계 테스트
@@ -54,6 +59,25 @@ class MemberTest {
         }
         
         // 검증과정 생략
+    }
+
+    @Test
+    void jpaEventBaseEntity() throws Exception {
+        Member member = new Member("회원1");
+        memberRepository.save(member); // @PrePersist 작동
+
+        Thread.sleep(100); // createdAt , updateAt 시간 구분해서 보기 위함 (실제로는 이런 방식은 지양)
+        member.setUsername("회원2"); // @PreUpdate 작동
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Member findMember = memberRepository.findById(member.getId()).get();// 바로 get 지양
+
+        log.info("findMember createdAt= {}", findMember.getCreatedAt());
+        log.info("findMember updatedAt= {}", findMember.getLastModifiedAt());
+        log.info("findMember createdBy= {}", findMember.getCreatedBy());
+        log.info("findMember lastModifiedBy= {}", findMember.getLastModifiedBy());
     }
 
 }

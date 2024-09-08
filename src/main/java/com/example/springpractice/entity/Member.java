@@ -11,7 +11,7 @@ import lombok.*;
 @ToString(of = {"id","username","age"}) // team은 무한루프 때문에 제외 (가급적 연관관계 없는 내부 필드만)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue
