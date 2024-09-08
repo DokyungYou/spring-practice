@@ -4,8 +4,10 @@ import com.example.springpractice.dto.MemberDto;
 import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.Team;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceUnitUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -324,5 +326,108 @@ class MemberRepositoryTest {
         log.info("age of findMember4 ={}", findMember.getAge()); //131
 
         assertThat(resultCount).isEqualTo(3);
+    }
+
+
+    /**
+     * (1)
+     *     select
+     *         m1_0.member_id,
+     *         m1_0.age,
+     *         m1_0.team_id,
+     *         m1_0.username
+     *     from
+     *         member m1_0
+     *
+     * (n) team을 가진 member 개수만큼 반복
+     *    select
+     *         t1_0.team_id,
+     *         t1_0.name
+     *     from
+     *         team t1_0
+     *     where
+     *         t1_0.team_id=?
+     *
+     * 
+     *  lazy 확인하려면 직접 오버라이딩한 findAll 주석처리하기
+     */
+    @Test
+    void findMemberLazy() {
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 15, teamA);
+        Member member2 = new Member("member2", 55, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Member> members = memberRepository.findAll(); // 일단 Member만 db에서 가져온다. (Lazy인 team은 프록시)
+        for (Member member : members) {
+            log.info("member= {}", member);
+            log.info("member.team class ={}",member.getTeam().getClass()); // Team$HibernateProxy$CNM0jSrO
+            log.info("member.team.getTeam ={}",member.getTeam().getName()); //.getName() 하는 순간 실제 쿼리문 날라가고 프록시 초기화);
+
+            /*
+            지연로딩 여부는 위와 같이 클래스를 직접확인하는 방법도 있지만, 아래와 같은 방법도 있다.
+
+            Hibernate 기능으로 확인
+            Hibernate.isInitialized(member.getTeam()); - boolean 반환
+
+            JPA 표준 방법으로 확인
+            PersistenceUnitUtil util =
+                    entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
+            util.isLoaded(member.getTeam());  - boolean 반환
+            */
+        }
+
+    }
+
+    @Test
+    void findMemberFetch() {
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 15, teamA);
+        Member member2 = new Member("member2", 55, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Member> members = memberRepository.findMemberFetchJoin();
+        for (Member member : members) {
+            log.info("member= {}", member);
+            log.info("member.team class ={}",member.getTeam().getClass()); // Team (실제 객체)
+            log.info("member.team.getTeam ={}",member.getTeam().getName());
+
+            /*
+            지연로딩 여부는 위와 같이 클래스를 직접확인하는 방법도 있지만, 아래와 같은 방법도 있다.
+
+            Hibernate 기능으로 확인
+            Hibernate.isInitialized(member.getTeam()); - boolean 반환
+
+            JPA 표준 방법으로 확인
+            PersistenceUnitUtil util =
+                    entityManager.getEntityManagerFactory().getPersistenceUnitUtil();
+            util.isLoaded(member.getTeam());  - boolean 반환
+            */
+        }
+
     }
 }

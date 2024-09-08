@@ -3,6 +3,7 @@ package com.example.springpractice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+@NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
 @NamedQuery(
         name="Member.findByUsername",
         query="select m from Member m where m.username = :username")
