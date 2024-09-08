@@ -5,6 +5,13 @@ spring:
     password: 0829
     driver-class-name: org.h2.Driver
 
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 100
+        #one-indexed-parameters: true  #web에서 page 파라미터를 -1 처리
+
   jpa:
     hibernate:
       ddl-auto: create  # 애플리케이션 실행 시점에 테이블 drop, 다시 생성
