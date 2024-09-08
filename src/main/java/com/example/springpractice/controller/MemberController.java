@@ -84,7 +84,7 @@ public class MemberController {
      * 서비스 계층에서 트랜잭션을 시작하면 레파지토리는 해당 트랜잭션을 전파 받아서 사용
      * 그래서 스프링 데이터 JPA를 사용할 때 트랜잭션이 없어도 데이터 등록, 변경이 가능했음(사실은 트랜잭션 이 리포지토리 계층에 걸려있는 것임)
      */
-    @PostConstruct
+    //@PostConstruct
     public void init(){
         for (int i = 1; i < 100; i++) {
 
