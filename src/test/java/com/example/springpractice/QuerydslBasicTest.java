@@ -7,6 +7,7 @@ import com.example.springpractice.entity.Team;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -405,5 +406,100 @@ public class QuerydslBasicTest {
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam()); // 엔티티의 초기화 여부
         assertThat(loaded).as("페치 조인 적용").isTrue();
+    }
+
+    /**
+     * 나이가 가장 많은 회원 조회
+     *
+     * select
+     *             m1_0.member_id,
+     *             m1_0.age,
+     *             m1_0.team_id,
+     *             m1_0.username
+     *         from
+     *             member m1_0
+     *         where
+     *             m1_0.age=(
+     *                 select
+     *                     max(m2_0.age)
+     *                 from
+     *                     member m2_0
+     *             )
+     */
+    @Test
+    void subQuery1() {
+        // alias 가 중복되지 않아야하는 경우
+        QMember memberSub = new QMember("memberSub");
+
+        List<Member> members = queryFactory
+                .selectFrom(member)
+                .where(member.age.eq(
+                        JPAExpressions.select(memberSub.age.max())
+                                .from(memberSub)
+                ))
+                .fetch();
+
+        assertThat(members).extracting("age").containsExactly(50);
+    }
+
+    /**
+     * 나이가 평균 이상인 회원
+     */
+    @Test
+    void subQueryGoe() {
+        // alias 가 중복되지 않아야하는 경우
+        QMember memberSub = new QMember("memberSub");
+
+        List<Member> members = queryFactory
+                .selectFrom(member)
+                .where(member.age.goe(
+                        JPAExpressions
+                                .select(memberSub.age.avg())
+                                .from(memberSub) //35
+                ))
+                .fetch();
+
+        assertThat(members).extracting("age").containsExactly(40, 50);
+    }
+
+
+    /**
+     * 서브쿼리 여러 건 처리, in 사용
+     */
+    @Test
+    void subQueryIn() {
+        // alias 가 중복되지 않아야하는 경우
+        QMember memberSub = new QMember("memberSub");
+
+        List<Member> members = queryFactory
+                .selectFrom(member)
+                .where(member.age.in(
+                        JPAExpressions
+                                .select(memberSub.age) // 30살 이상인 나이들 (30,40,50)
+                                .from(memberSub)
+                                .where(member.age.goe(30))
+                ))
+                .fetch();
+
+        assertThat(members).extracting("age").containsExactly(30, 40, 50);
+    }
+
+    @Test
+    void selectSubQuery() {
+        // alias 가 중복되지 않아야하는 경우
+        QMember memberSub = new QMember("memberSub");
+
+        List<Tuple> result = queryFactory.select(
+                        member.username,
+                        JPAExpressions // static import 가능하지만 냅둠
+                                .select(memberSub.age.avg())
+                                .from(memberSub)
+                )
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : result) {
+            log.info("tuple= {}", tuple);
+        }
     }
 }
