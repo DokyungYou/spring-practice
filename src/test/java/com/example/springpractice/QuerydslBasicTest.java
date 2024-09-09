@@ -563,4 +563,33 @@ public class QuerydslBasicTest {
             log.info("member ={}", s);
         }
     }
+
+    @Test
+    void simpleProjection() {
+        List<String> result1 = queryFactory
+                .select(member.username)
+                .from(member)
+                .fetch();
+
+        List<Member> result2 = queryFactory
+                .select(member)
+                .from(member)
+                .fetch();
+    }
+    @Test
+    void tupleProjection() {
+        // com.querydsl.core.Tuple
+        // Querydsl 에 종속적인 타입이므로 repository 나 DAO 계층 안에서만 쓰도록 한다.
+        List<Tuple> result = queryFactory
+                .select(member.username, member.age)
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : result) {
+            String username = tuple.get(member.username);
+            Integer age = tuple.get(member.age);
+
+            log.info("member ={} - {}", username, age);
+        }
+    }
 }
