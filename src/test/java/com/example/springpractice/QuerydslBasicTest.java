@@ -7,6 +7,7 @@ import com.example.springpractice.entity.Team;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -500,6 +501,44 @@ public class QuerydslBasicTest {
 
         for (Tuple tuple : result) {
             log.info("tuple= {}", tuple);
+        }
+    }
+
+    @Test
+    void basicCase() {
+
+        // 아래와 같이 db에서 직접 따로 문자열로 전환하고 보여주는 등은 지양 (애플리케이션에서 하기)
+        List<String> result = queryFactory
+                .select(member.age
+                        .when(20).then("20살")
+                        .when(30).then("30살")
+                        .when(40).then("40살")
+                        .otherwise("그 외")
+                )
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            log.info("age ={}", s);
+        }
+    }
+
+    @Test
+    void complexCase() {
+        
+        // 아래와 같이 db에서 직접 따로 문자열로 전환하고 보여주는 등은 지양 (애플리케이션에서 하기)
+        List<String> result = queryFactory
+                .select(new CaseBuilder()
+                        .when(member.age.between(20, 29)).then("20대")
+                        .when(member.age.between(30, 39)).then("30대")
+                        .when(member.age.between(40, 49)).then("40대")
+                        .when(member.age.between(50, 59)).then("50대")
+                        .otherwise("그 외")
+                ).from(member)
+                .fetch();
+
+        for (String s : result) {
+            log.info("age ={}", s);
         }
     }
 }
