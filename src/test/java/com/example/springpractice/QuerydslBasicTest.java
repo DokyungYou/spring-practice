@@ -10,6 +10,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -372,5 +374,36 @@ public class QuerydslBasicTest {
 
         assertThat(result).extracting("username")
                 .containsExactly("teamA","teamB");
+    }
+
+    @PersistenceUnit
+    EntityManagerFactory emf;
+    @Test
+    void fetchJoinNo() {
+        entityManager.flush();
+        entityManager.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam()); // 엔티티의 초기화 여부
+        assertThat(loaded).as("페치 조인 미적용").isFalse();
+    }
+
+    @Test
+    void fetchJoinYes() {
+        entityManager.flush();
+        entityManager.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team, team).fetchJoin()
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam()); // 엔티티의 초기화 여부
+        assertThat(loaded).as("페치 조인 적용").isTrue();
     }
 }
