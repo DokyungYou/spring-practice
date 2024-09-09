@@ -34,10 +34,6 @@ public class Member {
         this.age = age;
     }
 
-    public Member(String username) {
-        this.username = username;
-    }
-
     public void changeTeam(Team team) {
         // 양방향 연관관계 한번에 처리 (연관관계 편의 메서드)
         this.team = team;
