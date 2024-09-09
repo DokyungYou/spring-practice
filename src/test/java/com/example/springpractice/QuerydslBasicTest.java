@@ -6,6 +6,7 @@ import com.example.springpractice.entity.Team;
 import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.List;
 import static com.example.springpractice.entity.QMember.member;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @Transactional
 @SpringBootTest
 public class QuerydslBasicTest {
@@ -143,5 +145,33 @@ public class QuerydslBasicTest {
         long totalCount = queryFactory
                 .selectFrom(member)
                 .fetchCount();// deprecated
+    }
+
+
+    /**
+     * 회원 정렬순서
+     * 1. 회원 나이 내림차순
+     * 2. 회원 이름 올림차순
+     * 3. 2에서 회원 이름이 없으면 마지막에 출력 (nullsLast)
+     */
+    @Test
+    void sort() {
+        entityManager.persist(new Member(null, 50));
+        entityManager.persist(new Member(null, 100));
+        entityManager.persist(new Member("member5", 100));
+        entityManager.persist(new Member("member6", 30));
+
+        List<Member> members = queryFactory
+                .selectFrom(member)
+                .orderBy(
+                        member.age.desc(),
+                        member.username.asc().nullsLast()) // nullsFirst()
+                .fetch();
+
+        // 실제로 테스트시엔 출력 X, 검증으로만 이루어져야함
+        int order = 0;
+        for (Member member : members) {
+            log.info("{}st member = {}", ++order , member);
+        }
     }
 }
