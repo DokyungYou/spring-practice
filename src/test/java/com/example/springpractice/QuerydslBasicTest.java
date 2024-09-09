@@ -19,10 +19,12 @@ public class QuerydslBasicTest {
 
     @Autowired
     EntityManager entityManager;
-    JPAQueryFactory queryFactory = new JPAQueryFactory(entityManager);
+    JPAQueryFactory queryFactory;
 
     @BeforeEach
     void before() {
+        queryFactory = new JPAQueryFactory(entityManager);
+
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
         entityManager.persist(teamA);
