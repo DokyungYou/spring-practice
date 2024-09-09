@@ -6,6 +6,7 @@ import com.example.springpractice.dto.UserDto;
 import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.QMember;
 import com.example.springpractice.entity.Team;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
@@ -19,6 +20,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,7 @@ import java.util.List;
 
 import static com.example.springpractice.entity.QMember.member;
 import static com.example.springpractice.entity.QTeam.team;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.ITERABLE;
 
@@ -362,8 +365,8 @@ public class QuerydslBasicTest {
     /**
      * 연관관계 없는 엔티티 외부 조인
      * ex) 회원의 이름과 팀의 이름이 같은 대상 외부 조인
-     * JPQL: SELECT m, t FROM Member m LEFT JOIN Team t on m.username = t.name  
-     * * SQL: SELECT m.*, t.* FROM  Member m LEFT JOIN Team t ON m.username = t.name 
+     * JPQL: SELECT m, t FROM Member m LEFT JOIN Team t on m.username = t.name
+     * * SQL: SELECT m.*, t.* FROM  Member m LEFT JOIN Team t ON m.username = t.name
      * */
     @Test
     void join_on_no_relation() {
@@ -529,7 +532,7 @@ public class QuerydslBasicTest {
 
     @Test
     void complexCase() {
-        
+
         // 아래와 같이 db에서 직접 따로 문자열로 전환하고 보여주는 등은 지양 (애플리케이션에서 하기)
         List<String> result = queryFactory
                 .select(new CaseBuilder()
@@ -724,4 +727,28 @@ public class QuerydslBasicTest {
                 .from(member)
                 .fetch();
     }
+
+    @Test
+    void dynamicQuery_BooleanBuilder() {
+        String usernameParam = "member4";
+        Integer ageParam = 50;
+        List<Member> result = searchMember1(usernameParam, ageParam);
+        assertThat(result.size()).isEqualTo(1);
+    }
+
+    private List<Member> searchMember1(String usernameCondition, Integer ageCondition) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+        if (usernameCondition != null) {
+            builder.and(member.username.eq(usernameCondition));
+        }
+        if (ageCondition != null) {
+            builder.and(member.age.eq(ageCondition));
+        }
+
+        return queryFactory.selectFrom(member)
+                .where(builder)
+                .fetch();
+    }
+
 }
