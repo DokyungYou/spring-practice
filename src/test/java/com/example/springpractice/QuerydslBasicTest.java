@@ -1,6 +1,7 @@
 package com.example.springpractice;
 
 import com.example.springpractice.dto.MemberDto;
+import com.example.springpractice.dto.QMemberDto;
 import com.example.springpractice.dto.UserDto;
 import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.QMember;
@@ -688,7 +689,7 @@ public class QuerydslBasicTest {
 
         List<UserDto> result = queryFactory.select(
                         Projections.constructor(UserDto.class,
-                                // 이름이 아닌 순서,타입을 보고 매칭
+                                // 이름이 아닌 순서,타입을 보고 매칭 (문제가 있을 시 런타임에러)
                                 member.username,
                                 member.age
                                 )
@@ -699,5 +700,28 @@ public class QuerydslBasicTest {
         for (UserDto userDto : result) {
             log.info("userDto= {}", userDto);
         }
+    }
+
+    /**
+     * 컴파일러로 타입을 체크할 수 있으므로 가장 안전한 방법이지만
+     * DTO 자체가 Querydsl의 의존성을 가지게 되는 문제를 가짐
+     * - DTO에 QueryDSL 어노테이션을 유지 해야 하는 점
+     * - DTO까지 Q 파일을 생성해야 하는 단점
+     */
+
+    @Test
+    void findDtoByQueryProjection() {
+        List<MemberDto> result = queryFactory
+                .select(new QMemberDto(member.username, member.age))
+                .from(member)
+                .fetch();
+    }
+
+    @Test
+    void distinct() {
+        List<String> result = queryFactory
+                .select(member.username).distinct()
+                .from(member)
+                .fetch();
     }
 }
