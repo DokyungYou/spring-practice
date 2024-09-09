@@ -842,4 +842,13 @@ public class QuerydslBasicTest {
 
         assertThat(count).isEqualTo(1);
     }
+
+    @Test
+    void dialect() {
+        String result = queryFactory
+                .select(Expressions.stringTemplate("function('replace', {0}, {1}, {2})",
+                        member.username, "member", "M"))
+                .from(member)
+                .fetchFirst();
+    }
 }
