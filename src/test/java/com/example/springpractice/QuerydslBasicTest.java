@@ -3,6 +3,7 @@ package com.example.springpractice;
 import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.QMember;
 import com.example.springpractice.entity.Team;
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.example.springpractice.entity.QMember.member;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -112,5 +115,33 @@ public class QuerydslBasicTest {
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
         assertThat(findMember.getAge()).isEqualTo(20);
+    }
+
+    @Test
+    void resultFetchTest() {
+
+        // List
+        List<Member> members = queryFactory
+                .selectFrom(member)
+                .fetch();
+
+        // 단건 조회
+//       Member findMember1 = queryFactory
+//                .selectFrom(member)
+//                .fetchOne();
+
+       // 처음 한 건 조회
+        Member findMember2 = queryFactory
+                .selectFrom(member)
+                .fetchFirst(); // .limit(1).fetchOne()
+
+        // 페이징
+        QueryResults<Member> results = queryFactory
+                .selectFrom(member)
+                .fetchResults(); // deprecated
+
+        long totalCount = queryFactory
+                .selectFrom(member)
+                .fetchCount();// deprecated
     }
 }
