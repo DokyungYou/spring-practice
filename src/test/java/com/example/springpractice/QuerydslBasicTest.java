@@ -234,7 +234,7 @@ public class QuerydslBasicTest {
         List<Tuple> result = queryFactory
                 .select(team.name, member.age.avg())
                 .from(member)
-                .join(member.team, team)
+                .join(member.team, team) // 두번째 인자는 alias
                 .groupBy(team.name)
                 .fetch();
 
@@ -246,5 +246,44 @@ public class QuerydslBasicTest {
 
         assertThat(teamB.get(team.name)).isEqualTo("teamB");
         assertThat(teamB.get(member.age.avg())).isEqualTo(45);
+    }
+
+
+    /**
+     * 팀 A에 소속된 모든 회원 조회
+     */
+    @Test
+    void join() {
+        List<Member> result = queryFactory.selectFrom(member)
+                .join(member.team, team) // inner join
+                .where(team.name.eq("teamA"))
+                .fetch();
+
+        assertThat(result.size()).isEqualTo(2);
+
+        assertThat(result)
+                .extracting("username")
+                .containsExactly("member1","member2");
+    }
+
+
+    /**
+     * 세타 조인(연관관계가 없는 필드로 조인)
+     * 회원의 이름이 팀 이름과 같은 회원 조회
+     */
+    @Test
+    void theta_join() {
+        entityManager.persist(new Member("teamA"));
+        entityManager.persist(new Member("teamB"));
+        entityManager.persist(new Member("teamC"));
+
+        List<Member> result = queryFactory
+                .select(member)
+                .from(member, team) // 모든 Member, Team 테이블을 조인
+                .where(member.username.eq(team.name))
+                .fetch();
+
+        assertThat(result).extracting("username")
+                .containsExactly("teamA","teamB");
     }
 }
