@@ -85,4 +85,32 @@ public class QuerydslBasicTest {
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
     }
+
+    @Test
+    void search() {
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1")
+                        .and(member.age.eq(20)))
+                .fetchOne();
+
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+        assertThat(findMember.getAge()).isEqualTo(20);
+    }
+
+    @Test
+    void searchAndParam() {
+        Member findMember = queryFactory
+                .selectFrom(member)
+
+                // where(Predicate... o) 쉼표로 여러개를 넘기면, 모두 and
+                // 이 경우 중간에 null 이 들어가면 무시 (동적쿼리 만들 때 아주 좋은 조건)
+                .where(
+                        member.username.eq("member1"),
+                        member.age.eq(20))
+                .fetchOne();
+
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+        assertThat(findMember.getAge()).isEqualTo(20);
+    }
 }
