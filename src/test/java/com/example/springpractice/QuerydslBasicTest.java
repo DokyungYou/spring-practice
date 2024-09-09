@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,6 +29,7 @@ import static com.example.springpractice.entity.QTeam.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
+@Rollback(value = false)
 @Transactional
 @SpringBootTest
 public class QuerydslBasicTest {
@@ -281,6 +283,91 @@ public class QuerydslBasicTest {
                 .select(member)
                 .from(member, team) // 모든 Member, Team 테이블을 조인
                 .where(member.username.eq(team.name))
+                .fetch();
+
+        assertThat(result).extracting("username")
+                .containsExactly("teamA","teamB");
+    }
+
+    /** on절로 조인대상 필터링
+     *
+     * ex) 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인, 회원은 모두 조회
+     * JPQL: select m, t from Member m left join Team t on t.name = 'teamA'
+     * SQL: SELECT m.*, t.* FROM Member m LEFT JOIN Team t ON m.TEAM_ID=t.id and t.name='teamA
+     * MEMBER_ID  	AGE  	TEAM_ID  	USERNAME  	TEAM_ID  	NAME
+     *     1	    20	        1	     member1	    1	    teamA
+     *     2	    30	        1	     member2	    1	    teamA
+     *     3	    40	        2	     member3	   null	    null
+     *     4	    50	        2	     member4	   null	    null
+     *
+     *
+     *  ex) 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인, 팀은 모두 조회
+     * JPQL: select m, t from Member m right join Team t on t.name = 'teamA'
+     * SQL: SELECT m.*, t.* FROM Member m RIGHT JOIN Team t ON m.TEAM_ID=t.id and t.name='teamA
+     * MEMBER_ID  	AGE  	TEAM_ID  	USERNAME  	TEAM_ID  	NAME
+     *      1	     20	        1	     member1	    1	    teamA
+     *      2	     30	        1	     member2	    1	    teamA
+     *     null	     null	   null	      null	        2	    teamB
+     */
+
+    @Test
+    void join_on_filtering() {
+        List<Tuple> result1 = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team)
+                .on(team.name.eq("teamA"))
+                .fetch();
+
+        for (Tuple tuple : result1) {
+            log.info("leftJoin tuple ={}", tuple);
+        }
+
+
+        List<Tuple> result2 = queryFactory
+                .select(member, team)
+                .from(member)
+                .rightJoin(member.team, team)
+                .on(team.name.eq("teamA"))
+                .fetch();
+
+        for (Tuple tuple : result2) {
+            log.info("rightJoin tuple ={}", tuple);
+        }
+
+
+        // 이너 조인이면 on 절, where절 결과 동일
+        List<Tuple> result3 = queryFactory
+                .select(member, team)
+                .from(member)
+                .join(member.team, team)
+                //.on(team.name.eq("teamA"))
+                .where(team.name.eq("teamA")) // 결과 동일
+                .fetch();
+
+        for (Tuple tuple : result3) {
+            log.info("innerJoin tuple ={}", tuple);
+        }
+    }
+
+
+    /**
+     * 연관관계 없는 엔티티 외부 조인
+     * ex) 회원의 이름과 팀의 이름이 같은 대상 외부 조인
+     * JPQL: SELECT m, t FROM Member m LEFT JOIN Team t on m.username = t.name  
+     * * SQL: SELECT m.*, t.* FROM  Member m LEFT JOIN Team t ON m.username = t.name 
+     * */
+    @Test
+    void join_on_no_relation() {
+        entityManager.persist(new Member("teamA"));
+        entityManager.persist(new Member("teamB"));
+        entityManager.persist(new Member("teamC"));
+
+        List<Tuple> result = queryFactory
+                .select(member,team)
+                .from(member)
+                .leftJoin(team) // member.team X ,   member.team -> sql의 on 절에 m.team_id = t.team_id
+                .on(member.username.eq(team.name))
                 .fetch();
 
         assertThat(result).extracting("username")
