@@ -4,6 +4,7 @@ import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.QMember;
 import com.example.springpractice.entity.Team;
 import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -173,5 +178,25 @@ public class QuerydslBasicTest {
         for (Member member : members) {
             log.info("{}st member = {}", ++order , member);
         }
+    }
+
+    @Test
+    void paging1() {
+        Pageable pageable = PageRequest.of(1,2);
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> totalCount = queryFactory
+                .select(member.count())
+                .from(member);
+
+        // fetchOne 메서드를 인수로 전달하고, 조건에 따라 실행여부 결정
+        Page<Member> page = PageableExecutionUtils.getPage(result, pageable, totalCount::fetchOne);
+
     }
 }
