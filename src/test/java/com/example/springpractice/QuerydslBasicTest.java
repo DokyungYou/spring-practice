@@ -2,12 +2,11 @@ package com.example.springpractice;
 
 import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.QMember;
-import com.example.springpractice.entity.QTeam;
 import com.example.springpractice.entity.Team;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -29,11 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.example.springpractice.entity.QMember.member;
-import static com.example.springpractice.entity.QTeam.*;
+import static com.example.springpractice.entity.QTeam.team;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-@Rollback(value = false)
+//@Rollback(value = false)
 @Transactional
 @SpringBootTest
 public class QuerydslBasicTest {
@@ -539,6 +538,29 @@ public class QuerydslBasicTest {
 
         for (String s : result) {
             log.info("age ={}", s);
+        }
+    }
+
+    @Test
+    void constant() {
+
+        List<Tuple> result = queryFactory
+                .select(member.username, Expressions.constant("A"))
+                .from(member)
+                .fetch();
+        for (Tuple tuple : result) {
+            log.info("tuple ={}", tuple);
+        }
+    }
+
+    @Test
+    void concat() {
+        List<String> result = queryFactory
+                .select(member.username.concat("_").concat(member.age.stringValue())) // 문자가 아닌 타입들을 문자로 변환 가능 (ENUM 을 처리할때도 자주 사용)
+                .from(member)
+                .fetch();
+        for (String s : result) {
+            log.info("member ={}", s);
         }
     }
 }
