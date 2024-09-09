@@ -31,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -785,5 +786,60 @@ public class QuerydslBasicTest {
 
     private Predicate allEq(String usernameCondition, Integer ageCondition){
         return usernameEq(usernameCondition).and(ageEq(ageCondition));
+    }
+
+    //@Commit
+    @Test
+    void bulkUpdate() {
+        // 영향을 받은 row 수 반환
+        long count = queryFactory
+                .update(member)
+                .set(member.username, "젊은이")
+                .where(member.age.lt(40))
+                .execute();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    void bulkAdd() {
+        long count = queryFactory
+                .update(member)
+                .set(member.age, member.age.add(-1))
+                .execute();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(count).isEqualTo(4);
+    }
+
+    @Test
+    void bulkMultiple() {
+        long count = queryFactory
+                .update(member)
+                .set(member.age, member.age.multiply(2))
+                .execute();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(count).isEqualTo(4);
+    }
+
+    @Test
+    void bulkDelete() {
+        long count = queryFactory
+                .delete(member)
+                .where(member.age.lt(30))
+                .execute();
+
+        entityManager.flush();
+        entityManager.clear();
+
+        assertThat(count).isEqualTo(1);
     }
 }
