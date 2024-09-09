@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.example.springpractice.entity.QMember.member;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -55,10 +56,31 @@ public class QuerydslBasicTest {
     @Test
     void startQuerydsl() {
 
-        QMember m = new QMember("m"); // alias (안쓸거라서 중요 X)
+        QMember m = new QMember("m"); // alias (보통 평소에는 사용X, 같은 테이블을 조인해야하는 경우에 사용)
         Member findMember = queryFactory
                 .selectFrom(m)
                 .where(m.username.eq("member1")) // 자동으로 jdbc에 있는 prepate statement로 파라미터 바인딩
+                .fetchOne();
+
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    void startQuerydsl2() {
+        QMember m = member;
+        Member findMember = queryFactory
+                .selectFrom(m)
+                .where(m.username.eq("member1")) // 자동으로 jdbc에 있는 prepate statement로 파라미터 바인딩
+                .fetchOne();
+
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+    @Test
+    void startQuerydsl3() {
+        // QMember.member -> static import
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1")) // 자동으로 jdbc에 있는 prepate statement로 파라미터 바인딩
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
