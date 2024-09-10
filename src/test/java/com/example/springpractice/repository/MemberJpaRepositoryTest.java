@@ -79,7 +79,7 @@ class MemberJpaRepositoryTest {
         condition.setAgeLoe(50);
         condition.setTeamName("teamB");
 
-        List<MemberTeamDto> results = memberJpaRepository.searchByBuilder(condition);
+        List<MemberTeamDto> results = memberJpaRepository.search(condition);
 
         assertThat(results.size()).isEqualTo(2);
         assertThat(results).extracting("username")

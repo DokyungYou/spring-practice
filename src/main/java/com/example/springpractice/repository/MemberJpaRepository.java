@@ -7,6 +7,7 @@ import com.example.springpractice.entity.Member;
 import com.example.springpractice.entity.QMember;
 import com.example.springpractice.entity.QTeam;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -103,6 +104,49 @@ public class MemberJpaRepository {
                     .leftJoin(member.team, team)
                     .where(builder)
                     .fetch();
+    }
+
+    public List<MemberTeamDto> search(MemberSearchCondition condition){
+
+        return queryFactory.select(new QMemberTeamDto(
+                        member.id.as("memberId"),
+                        member.username,
+                        member.age,
+                        team.id.as("teamId"),
+                        team.name.as("teamName")
+                ))
+                .from(member)
+                .leftJoin(member.team, team)
+                .where(
+                        usernameEq(condition.getUsername()),
+                        teamNameEq(condition.getTeamName()),
+                        ageGoe(condition.getAgeGoe()),
+                        ageLoe(condition.getAgeLoe())
+                        )
+                .fetch();
+    }
+
+    // Predicate 보다는 BooleanExpression 으로 반환하기 (나중에 조합이 가능하기 때문)
+    private BooleanExpression usernameEq(String username) {
+        return StringUtils.hasText(username) ? member.username.eq(username) : null;
+    }
+
+    private BooleanExpression teamNameEq(String teamName) {
+        return StringUtils.hasText(teamName) ? team.name.eq(teamName) : null;
+    }
+
+    private BooleanExpression ageLoe(Integer ageLoe) {
+        return ageLoe != null ? member.age.loe(ageLoe) : null;
+    }
+
+    private BooleanExpression ageGoe(Integer ageGoe) {
+        return ageGoe != null ? member.age.goe(ageGoe) : null;
+    }
+
+
+    // 재조합 예시
+    private BooleanExpression ageBetween(int ageGoe, int ageLoe) {
+        return ageGoe(ageGoe).and(ageLoe(ageLoe));
     }
 
 }
