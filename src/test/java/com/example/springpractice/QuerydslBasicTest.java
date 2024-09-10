@@ -851,4 +851,5 @@ public class QuerydslBasicTest {
                 .from(member)
                 .fetchFirst();
     }
+
 }
