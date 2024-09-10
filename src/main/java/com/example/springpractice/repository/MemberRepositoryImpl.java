@@ -3,15 +3,18 @@ package com.example.springpractice.repository;
 import com.example.springpractice.dto.MemberSearchCondition;
 import com.example.springpractice.dto.MemberTeamDto;
 import com.example.springpractice.dto.QMemberTeamDto;
+import com.example.springpractice.entity.Member;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -153,16 +156,15 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long totalCount = queryFactory
-                .select(member)
+        JPAQuery<Long> countQuery = queryFactory
+                .select(member.count())
                 .from(member)
                 .leftJoin(member.team, team)
                 .where(usernameEq(condition.getUsername()),
                         teamNameEq(condition.getTeamName()),
                         ageGoe(condition.getAgeGoe()),
-                        ageLoe(condition.getAgeLoe()))
-                .fetchCount(); // deprecated
+                        ageLoe(condition.getAgeLoe()));
 
-        return new PageImpl<>(content, pageable, totalCount);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne); // () -> countQuery.fetchOne()
     }
 }
